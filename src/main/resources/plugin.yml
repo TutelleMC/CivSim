@@ -1,0 +1,5 @@
+name: CivSimBukkit
+version: '${version}'
+main: io.github.metriximor.civsimbukkit.CivSimBukkitPlugin
+api-version: '1.18'
+author: Metriximor

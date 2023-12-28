@@ -1,0 +1,91 @@
+plugins {
+    id 'java'
+    id 'io.freefair.lombok' version '8.4'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
+    id "org.ajoberstar.reckon" version "0.18.1"
+}
+
+group 'io.github.metriximor'
+
+reckon {
+    defaultInferredScope = "minor"
+    snapshots()
+    scopeCalc = calcScopeFromProp()
+    stageCalc = calcStageFromProp()
+}
+
+shadowJar {
+    manifest {
+        attributes 'Implementation-Title': project.name,
+                'Implementation-Version': project.version
+    }
+    relocate 'co.aikar.commands', 'io.github.metriximor.civsimbukkit.acf'
+    relocate 'co.aikar.locales', 'io.github.metriximor.civsimbukkit.locales'
+}
+
+repositories {
+    mavenCentral()
+    maven {
+        name = "papermc-repo"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    maven {
+        name = "sonatype"
+        url = "https://oss.sonatype.org/content/groups/public/"
+    }
+    maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url "https://maven.enginehub.org/repo/" }
+    maven { url 'https://jitpack.io' }
+}
+
+dependencies {
+    // Minecraft
+    //noinspection VulnerableLibrariesLocal
+    compileOnly(testImplementation("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT"))
+
+    // GUI
+    implementation 'com.github.Matt-MX:KtPaperGui:1.1.0'
+
+    // Commands
+    implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
+
+    // Testing
+    testImplementation "org.mockito:mockito-core:3.+"
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+}
+
+def targetJavaVersion = 17
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+processResources {
+    def props = [version: version.toString()]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('plugin.yml') {
+        expand props
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileJava {
+    options.compilerArgs += ["-parameters"]
+}
+
+tasks.register('name') {
+    println project.name
+}
+
+tasks.register('proj_version') {
+    println project.version
+}
+
