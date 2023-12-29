@@ -4,7 +4,7 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
-import io.github.metriximor.civsimbukkit.domain.Nodes;
+import io.github.metriximor.civsimbukkit.models.Nodes;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
