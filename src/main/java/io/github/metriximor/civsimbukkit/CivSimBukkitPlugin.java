@@ -24,7 +24,6 @@ public final class CivSimBukkitPlugin extends JavaPlugin {
 
         // Register Events
         pluginManager.registerEvents(new NodeListener(nodeService), this);
-
         logger.info("CivSimBukkit Plugin loaded successfully");
     }
 
