@@ -45,6 +45,7 @@ dependencies {
 
     // GUI
     implementation 'com.github.Matt-MX:KtPaperGui:1.1.0'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22'
 
     // Commands
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'

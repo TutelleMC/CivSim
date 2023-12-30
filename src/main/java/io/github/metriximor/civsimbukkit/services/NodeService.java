@@ -24,7 +24,7 @@ public class NodeService {
 
     private final Set<Block> registeredNodes = new HashSet<>();
 
-    public boolean isNode(final Block block) {
+    public boolean isNode(@NonNull final Block block) {
         if (block.getState() instanceof Barrel state) {
             return state.getPersistentDataContainer().has(getMarkerKey());
         }
@@ -39,6 +39,7 @@ public class NodeService {
         setNodeMarker(state.getPersistentDataContainer());
         state.update();
 
+        logger.info("Registered Node at %s".formatted(block.getLocation()));
         registeredNodes.add(block);
     }
 
@@ -68,7 +69,7 @@ public class NodeService {
         return getKey("marker");
     }
 
-    private NamespacedKey getKey(final String string) {
-        return new NamespacedKey(plugin, string);
+    private NamespacedKey getKey(final String key) {
+        return new NamespacedKey(plugin, key);
     }
 }

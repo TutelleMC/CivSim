@@ -1,5 +1,6 @@
 package io.github.metriximor.civsimbukkit;
 
+import com.mattmx.ktgui.GuiManager;
 import io.github.metriximor.civsimbukkit.listeners.NodeListener;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
@@ -17,6 +18,8 @@ public final class CivSimBukkitPlugin extends JavaPlugin {
     public void onEnable() {
         logger.info("Initializing CivSimBukkit plugin...");
         saveDefaultConfig();
+
+        GuiManager.INSTANCE.init(this);
 
         // Service Instantiation
         final NodeService nodeService = new NodeService(logger, this);

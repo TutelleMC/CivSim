@@ -1,10 +1,11 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
+import io.github.metriximor.civsimbukkit.guis.FarmGUI;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.block.Block;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,10 +19,23 @@ public class NodeListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerRightClickOnABlock(@NotNull final PlayerInteractEvent event) {
-        if (!event.getAction().isRightClick() || isNotANode(event.getClickedBlock())) {
+        final var itemInHand = event.getItem();
+        final var clickedBlock = event.getClickedBlock();
+        if (itemInHand == null || clickedBlock == null) {
+            event.getPlayer().sendMessage("Item or block was null, ignoring");
             return;
         }
-        event.getPlayer().sendMessage("You just clicked on a farm! :)");
+
+        if (!event.getAction().isLeftClick() ||
+                !itemInHand.getType().equals(Material.STICK) ||
+                !nodeService.isNode(clickedBlock)) {
+            event.getPlayer().sendMessage("Conditions not met for opening node inventory");
+            return;
+        }
+
+        event.getPlayer().sendMessage("Opening Farm GUI");
+        final var farmGUI = new FarmGUI();
+        farmGUI.open(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -35,13 +49,9 @@ public class NodeListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onNodeBeingDestroyed(@NotNull final BlockDestroyEvent event) {
-        if (isNotANode(event.getBlock())) {
+        if (!nodeService.isNode(event.getBlock())) {
             return;
         }
         nodeService.unregisterNode(event.getBlock());
-    }
-
-    private boolean isNotANode(final Block clickedBlock) {
-        return clickedBlock == null || nodeService.isNode(clickedBlock);
     }
 }
