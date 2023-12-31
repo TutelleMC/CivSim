@@ -21,6 +21,7 @@ shadowJar {
     }
     relocate 'co.aikar.commands', 'io.github.metriximor.civsimbukkit.acf'
     relocate 'co.aikar.locales', 'io.github.metriximor.civsimbukkit.locales'
+    relocate 'com.jeff_media.morepersistentdatatypes', 'io.github.metriximor.civsimbukkit.morepersistentdatatypes'
 }
 
 repositories {
@@ -33,7 +34,9 @@ repositories {
         name = "sonatype"
         url = "https://oss.sonatype.org/content/groups/public/"
     }
-    maven { url = "https://repo.aikar.co/content/groups/aikar/" }
+    maven { url 'https://repo.xenondevs.xyz/releases' }
+    maven { url 'https://hub.jeff-media.com/nexus/repository/jeff-media-public/' }
+    maven { url "https://repo.aikar.co/content/groups/aikar/" }
     maven { url "https://maven.enginehub.org/repo/" }
     maven { url 'https://jitpack.io' }
 }
@@ -43,9 +46,10 @@ dependencies {
     //noinspection VulnerableLibrariesLocal
     compileOnly(testImplementation("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT"))
 
+    implementation 'com.jeff_media:MorePersistentDataTypes:2.4.0'
+
     // GUI
-    implementation 'com.github.Matt-MX:KtPaperGui:1.1.0'
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22'
+    implementation "xyz.xenondevs.invui:invui:1.24"
 
     // Commands
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
