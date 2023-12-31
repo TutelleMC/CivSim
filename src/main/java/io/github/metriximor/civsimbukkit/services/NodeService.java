@@ -57,6 +57,7 @@ public class NodeService {
         // Add wage itemStacks to node
         final var pdc = node.getState().getPersistentDataContainer();
         pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
+        node.getState().update();
     }
 
     public Optional<ItemStack> takeWages(@NonNull final Node node) {
