@@ -12,6 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -20,12 +21,15 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import static io.github.metriximor.civsimbukkit.services.ItemSetService.SetType.WAGES;
 
 @CommandAlias("civsim|csim")
 @RequiredArgsConstructor
+@SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
     private final NodeService nodeService;
@@ -65,18 +69,29 @@ public class CivSimCommand extends BaseCommand {
             giveItemToPlayer(player, itemSetService.createItemSetItemStack(WAGES, requiredItem));
         }
 
-        @Subcommand("get")
+        @Subcommand("remove")
+        @Description("Removes the wages from the block that is being looked at")
         public void onGet(@NonNull final Player player) {
+            getWagesFromNode(player, nodeService::takeWages);
+        }
+
+        @Subcommand("copy")
+        @Description("Copies the wages from the block that is being looked at without erasing the block's wages")
+        public void onCopy(@NonNull final Player player) {
+            getWagesFromNode(player, nodeService::copyWages);
+        }
+
+        private void getWagesFromNode(final Player player, Function<Node, Optional<ItemStack>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
             final var node = Node.make(blockLookedAt);
             if (node.isEmpty()) {
-                player.sendMessage("You must be looking at a workable building block");
+                player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
                 return;
             }
 
-            final var wages = nodeService.takeWages(node.get());
+            final var wages = action.apply(node.get());
             if (wages.isEmpty()) {
-                player.sendMessage("Node doesn't have wages");
+                player.sendMessage("%sNode doesn't have wages".formatted(ChatColor.RED));
                 return;
             }
             giveItemToPlayer(player, wages.get());

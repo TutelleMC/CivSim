@@ -54,20 +54,33 @@ public class NodeService {
         final var wagesPdc = wages.getItemMeta().getPersistentDataContainer();
         final var wageItems = wagesPdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
 
+        logger.info("Wage items gotten: %s".formatted(wageItems));
+
         // Add wage itemStacks to node
-        final var pdc = node.getState().getPersistentDataContainer();
+        final var state = node.getState();
+        final var pdc = state.getPersistentDataContainer();
         pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
-        node.getState().update();
+        state.update();
     }
 
     public Optional<ItemStack> takeWages(@NonNull final Node node) {
+        final var wages = copyWages(node);
+        if (wages.isEmpty()) {
+            return Optional.empty();
+        }
+        final var state = node.getState();
+        state.getPersistentDataContainer().remove(getWagesKey());
+        state.update();
+        return wages;
+    }
+
+    public Optional<ItemStack> copyWages(@NonNull final Node node) {
         final var pdc = node.getState().getPersistentDataContainer();
         if (!pdc.has(getWagesKey())) {
             return Optional.empty();
         }
         final var wages = Objects.requireNonNull(pdc.get(getWagesKey(),
                 DataType.asList(DataType.ITEM_STACK)));
-        pdc.remove(getWagesKey());
         logger.info("Removing wages from node %s".formatted(node));
         return Optional.of(itemSetService.createItemSetItemStack(
                 ItemSetService.SetType.WAGES,
