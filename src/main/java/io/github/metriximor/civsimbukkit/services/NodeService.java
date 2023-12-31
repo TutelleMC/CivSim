@@ -51,13 +51,12 @@ public class NodeService {
         }
         logger.info("Writing wages to node %s".formatted(node));
         // Retrieve wage itemStacks from wages item
-        final var wageItems = Objects.requireNonNull(
-                wages.getItemMeta().getPersistentDataContainer().get(getWagesKey(),
-                        DataType.asArray(new ItemStack[0], DataType.ITEM_STACK)));
+        final var wagesPdc = wages.getItemMeta().getPersistentDataContainer();
+        final var wageItems = wagesPdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
 
         // Add wage itemStacks to node
         final var pdc = node.getState().getPersistentDataContainer();
-        pdc.set(getWagesKey(), DataType.ITEM_STACK_ARRAY, wageItems);
+        pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
     }
 
     public Optional<ItemStack> takeWages(@NonNull final Node node) {
@@ -66,12 +65,12 @@ public class NodeService {
             return Optional.empty();
         }
         final var wages = Objects.requireNonNull(pdc.get(getWagesKey(),
-                DataType.asArray(new ItemStack[0], DataType.ITEM_STACK)));
+                DataType.asList(DataType.ITEM_STACK)));
         pdc.remove(getWagesKey());
         logger.info("Removing wages from node %s".formatted(node));
         return Optional.of(itemSetService.createItemSetItemStack(
                 ItemSetService.SetType.WAGES,
-                Arrays.stream(wages).toList()));
+                wages));
     }
 
     public void addMarker(@NonNull final ItemStack itemStack) {

@@ -34,8 +34,8 @@ public class ItemSetService {
         wagesItemStack.editMeta(meta ->
                 meta.getPersistentDataContainer().set(
                         PersistentDataService.getKey(typeName),
-                        DataType.ITEM_STACK_ARRAY,
-                        items.toArray(new ItemStack[0])
+                        DataType.asList(DataType.ITEM_STACK),
+                        items
                 )
         );
         final List<Component> lore = new ArrayList<>(items.stream().map(itemStack -> {
