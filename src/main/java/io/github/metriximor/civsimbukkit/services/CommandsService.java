@@ -1,19 +1,21 @@
 package io.github.metriximor.civsimbukkit.services;
 
+import co.aikar.commands.BaseCommand;
 import co.aikar.commands.PaperCommandManager;
-import io.github.metriximor.civsimbukkit.commands.CivSimCommand;
 import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
+
+import java.util.List;
 
 public class CommandsService {
     private final PaperCommandManager paperCommandManager;
 
     public CommandsService(@NonNull final Plugin plugin,
-                           @NonNull final NodeService nodeService) {
+                           @NonNull final List<BaseCommand> commands) {
         this.paperCommandManager = new PaperCommandManager(plugin);
 
         paperCommandManager.enableUnstableAPI("help");
 
-        paperCommandManager.registerCommand(new CivSimCommand(plugin, nodeService));
+        commands.forEach(paperCommandManager::registerCommand);
     }
 }

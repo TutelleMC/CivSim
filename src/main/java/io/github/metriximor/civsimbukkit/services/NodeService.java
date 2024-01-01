@@ -1,39 +1,36 @@
 package io.github.metriximor.civsimbukkit.services;
 
+import com.jeff_media.morepersistentdatatypes.DataType;
+import io.github.metriximor.civsimbukkit.models.Node;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.NamespacedKey;
-import org.bukkit.block.Barrel;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.logging.Logger;
+
+import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
 
 @RequiredArgsConstructor
 public class NodeService {
-    @NonNull
     private final Logger logger;
-    @NonNull
-    private final Plugin plugin;
+    private final ItemSetService itemSetService;
 
+    //TODO move this set to a proper repository class
     private final Set<Block> registeredNodes = new HashSet<>();
 
-    public boolean isNode(@NonNull final Block block) {
-        if (block.getState() instanceof Barrel state) {
-            return state.getPersistentDataContainer().has(getMarkerKey());
-        }
-        return false;
+    public Optional<Node> getNode(final Block block) {
+        return Node.make(block)
+                .filter(node -> node.getState().getPersistentDataContainer().has(PersistentDataService.getMarkerKey()));
     }
 
     public void registerNode(@NonNull final Block block) {
         if (!(block.getState() instanceof TileState state)) {
-            logger.severe("Attempted to register %s as a node despite it not being a tileable block".formatted(block));
+            logger.severe("Attempted to register %s as a node despite it not being a tile-able block".formatted(block));
             return;
         }
         setNodeMarker(state.getPersistentDataContainer());
@@ -44,13 +41,51 @@ public class NodeService {
     }
 
     public void unregisterNode(@NonNull final Block block) {
-        if (!isNode(block)) {
-            logger.severe("Attempted to unregister block that isn't a node: %s".formatted(block));
-            return;
-        }
         if (!registeredNodes.remove(block)) {
             logger.severe("Failed to remove node from registered nodes: %s".formatted(block));
         }
+    }
+
+    public void addWages(@NonNull final Node node, @NonNull final ItemStack wages) {
+        if (!itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, wages)) {
+            return;
+        }
+        logger.info("Writing wages to node %s".formatted(node));
+        // Retrieve wage itemStacks from wages item
+        final var wagesPdc = wages.getItemMeta().getPersistentDataContainer();
+        final var wageItems = wagesPdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
+
+        logger.info("Wage items gotten: %s".formatted(wageItems));
+
+        // Add wage itemStacks to node
+        final var state = node.getState();
+        final var pdc = state.getPersistentDataContainer();
+        pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
+        state.update();
+    }
+
+    public Optional<ItemStack> takeWages(@NonNull final Node node) {
+        final var wages = copyWages(node);
+        if (wages.isEmpty()) {
+            return Optional.empty();
+        }
+        final var state = node.getState();
+        state.getPersistentDataContainer().remove(getWagesKey());
+        state.update();
+        return wages;
+    }
+
+    public Optional<ItemStack> copyWages(@NonNull final Node node) {
+        final var pdc = node.getState().getPersistentDataContainer();
+        if (!pdc.has(getWagesKey())) {
+            return Optional.empty();
+        }
+        final var wages = Objects.requireNonNull(pdc.get(getWagesKey(),
+                DataType.asList(DataType.ITEM_STACK)));
+        logger.info("Removing wages from node %s".formatted(node));
+        return Optional.of(itemSetService.createItemSetItemStack(
+                ItemSetService.SetType.WAGES,
+                wages));
     }
 
     public void addMarker(@NonNull final ItemStack itemStack) {
@@ -58,18 +93,10 @@ public class NodeService {
     }
 
     public boolean hasMarker(@NonNull final ItemStack itemStack) {
-        return itemStack.getItemMeta().getPersistentDataContainer().has(getMarkerKey());
+        return itemStack.getItemMeta().getPersistentDataContainer().has(PersistentDataService.getMarkerKey());
     }
 
     private void setNodeMarker(final PersistentDataContainer persistentDataContainer) {
-        persistentDataContainer.set(getMarkerKey(), PersistentDataType.BYTE, (byte) 1);
-    }
-
-    private NamespacedKey getMarkerKey() {
-        return getKey("marker");
-    }
-
-    private NamespacedKey getKey(final String key) {
-        return new NamespacedKey(plugin, key);
+        persistentDataContainer.set(PersistentDataService.getMarkerKey(), PersistentDataType.BYTE, (byte) 1);
     }
 }

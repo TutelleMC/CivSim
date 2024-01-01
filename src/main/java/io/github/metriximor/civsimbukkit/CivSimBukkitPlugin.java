@@ -1,16 +1,18 @@
 package io.github.metriximor.civsimbukkit;
 
-import com.mattmx.ktgui.GuiManager;
+import io.github.metriximor.civsimbukkit.commands.CivSimCommand;
 import io.github.metriximor.civsimbukkit.listeners.NodeListener;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
+import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public final class CivSimBukkitPlugin extends JavaPlugin {
+public class CivSimBukkitPlugin extends JavaPlugin {
     private final Logger logger = getLogger();
     private final PluginManager pluginManager = getServer().getPluginManager();
 
@@ -19,14 +21,16 @@ public final class CivSimBukkitPlugin extends JavaPlugin {
         logger.info("Initializing CivSimBukkit plugin...");
         saveDefaultConfig();
 
-        GuiManager.INSTANCE.init(this);
-
         // Service Instantiation
-        final NodeService nodeService = new NodeService(logger, this);
-        final CommandsService commandsService = new CommandsService(this, nodeService);
+        final ItemSetService itemSetService = new ItemSetService();
+        final NodeService nodeService = new NodeService(logger, itemSetService);
+
+        final CommandsService commandsService = new CommandsService(this, List.of(
+                new CivSimCommand(logger, nodeService, itemSetService)
+        ));
 
         // Register Events
-        pluginManager.registerEvents(new NodeListener(nodeService), this);
+        pluginManager.registerEvents(new NodeListener(nodeService, itemSetService), this);
 
         logger.info("CivSimBukkit Plugin loaded successfully");
     }
