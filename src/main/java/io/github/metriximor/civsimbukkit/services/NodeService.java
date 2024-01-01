@@ -20,6 +20,7 @@ public class NodeService {
     private final Logger logger;
     private final ItemSetService itemSetService;
 
+    //TODO move this set to a proper repository class
     private final Set<Block> registeredNodes = new HashSet<>();
 
     public Optional<Node> getNode(final Block block) {

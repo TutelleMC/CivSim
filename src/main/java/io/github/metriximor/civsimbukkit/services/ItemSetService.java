@@ -6,7 +6,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.TextDecoration;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -39,10 +38,8 @@ public class ItemSetService {
                 )
         );
         final List<Component> lore = new ArrayList<>(items.stream().map(itemStack -> {
-                    final var itemMetaDisplayName = itemStack.getItemMeta().displayName();
-                    final var displayName = itemMetaDisplayName == null ? itemStack.displayName() : itemMetaDisplayName;
-                    final String name = PlainTextComponentSerializer.plainText().serialize(displayName);
-                    return (Component) Component.text("%s %s".formatted(itemStack.getAmount(), name));
+                    final String name = StringUtils.convertToTitleCaseSplitting(itemStack.getType().toString(), "_");
+                    return (Component) Component.text("%s - %s".formatted(itemStack.getAmount(), name));
                 })
                 .toList());
         lore.add(Component.text("To use me, left click me into a workable building").decorate(TextDecoration.ITALIC));

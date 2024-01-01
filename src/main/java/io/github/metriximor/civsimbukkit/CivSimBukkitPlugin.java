@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
-public final class CivSimBukkitPlugin extends JavaPlugin {
+public class CivSimBukkitPlugin extends JavaPlugin {
     private final Logger logger = getLogger();
     private final PluginManager pluginManager = getServer().getPluginManager();
 

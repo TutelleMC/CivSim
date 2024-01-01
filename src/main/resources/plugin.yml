@@ -1,4 +1,4 @@
-name: CivSimBukkit
+name: CivSimBukkit # If this is changed don't forget to also change the PersistentDataService class too
 version: '${version}'
 main: io.github.metriximor.civsimbukkit.CivSimBukkitPlugin
 api-version: '1.18'
