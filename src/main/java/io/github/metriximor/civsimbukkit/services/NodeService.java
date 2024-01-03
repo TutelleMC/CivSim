@@ -51,13 +51,13 @@ public class NodeService {
         return node.isEnabled();
     }
 
-    public void addWages(@NonNull final Block block, @NonNull final ItemStack wages) {
+    public boolean addWages(@NonNull final Block block, @NonNull final ItemStack wages) {
         if (!itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, wages)) {
-            return;
+            return false;
         }
         final var node = nodeRepository.getById(block);
         if (node == null || node.isEnabled()) {
-            return;
+            return false;
         }
 
         // Retrieve wage itemStacks from wages item
@@ -65,11 +65,11 @@ public class NodeService {
         final var wageItems = wagesPdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
         if (wageItems == null || wageItems.isEmpty()) {
             logger.warning("Wage config %s had no wages defined!".formatted(wages));
-            return;
+            return false;
         }
 
         logger.info("Writing wages to node %s".formatted(node));
-        node.setWages(wageItems);
+        return node.setWages(wageItems);
     }
 
     @NonNull

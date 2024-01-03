@@ -87,8 +87,27 @@ class NodeServiceTest {
 
         final ItemStack wages = getSampleWages();
 
-        nodeService.addWages(barrel, wages);
+        assertTrue(nodeService.addWages(barrel, wages));
         assertTrue(nodeService.copyWages(barrel).isPresent());
+        assertTrue(nodeService.takeWages(barrel).isPresent());
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
+    }
+
+    @Test
+    void testCantChangeWagesWhenNodeIsEnabled() {
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        final ItemStack wages = getSampleWages();
+
+        nodeService.toggleNode(barrel);
+        assertFalse(nodeService.addWages(barrel, wages));
+        nodeService.toggleNode(barrel);
+        assertTrue(nodeService.addWages(barrel, wages));
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        nodeService.toggleNode(barrel);
+        assertTrue(nodeService.takeWages(barrel).isEmpty());
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        nodeService.toggleNode(barrel);
         assertTrue(nodeService.takeWages(barrel).isPresent());
         assertTrue(nodeService.copyWages(barrel).isEmpty());
     }

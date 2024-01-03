@@ -90,5 +90,6 @@ public final class Node {
         final var pdc = state.getPersistentDataContainer();
         final var toggleStatus = isEnabled();
         pdc.set(ENABLED_KEY, DataType.BOOLEAN, !toggleStatus);
+        state.update();
     }
 }
