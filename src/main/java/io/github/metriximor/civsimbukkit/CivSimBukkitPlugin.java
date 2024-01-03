@@ -9,41 +9,39 @@ import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
+import java.util.List;
+import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-import java.util.logging.Logger;
-
 @SuppressWarnings("unused")
 public class CivSimBukkitPlugin extends JavaPlugin {
-    private final Logger logger = getLogger();
-    private final PluginManager pluginManager = getServer().getPluginManager();
+	private final Logger logger = getLogger();
+	private final PluginManager pluginManager = getServer().getPluginManager();
 
-    @Override
-    public void onEnable() {
-        logger.info("Initializing CivSimBukkit plugin...");
-        saveDefaultConfig();
+	@Override
+	public void onEnable() {
+		logger.info("Initializing CivSimBukkit plugin...");
+		saveDefaultConfig();
 
-        // Service Instantiation
-        final ItemSetService itemSetService = new ItemSetService();
-        final Repository<Block, Node> nodeRepository = new InMemoryNodeRepository();
-        final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
+		// Service Instantiation
+		final ItemSetService itemSetService = new ItemSetService();
+		final Repository<Block, Node> nodeRepository = new InMemoryNodeRepository();
+		final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
 
-        final CommandsService commandsService = new CommandsService(this, List.of(
-                new CivSimCommand(logger, nodeService, itemSetService)
-        ));
-        final UIController uiController = new UIController(nodeService);
+		final CommandsService commandsService = new CommandsService(this,
+				List.of(new CivSimCommand(logger, nodeService, itemSetService)));
+		final UIController uiController = new UIController(nodeService);
 
-        // Register Events
-        pluginManager.registerEvents(new NodeListener(nodeService, itemSetService, uiController), this);
+		// Register Events
+		pluginManager.registerEvents(new NodeListener(nodeService, itemSetService, uiController), this);
 
-        logger.info("CivSimBukkit Plugin loaded successfully");
-    }
+		logger.info("CivSimBukkit Plugin loaded successfully");
+	}
 
-    public static String getVersion() {
-        final String version = CivSimBukkitPlugin.class.getPackage().getImplementationVersion();
-        return version == null ? "dev" : version;
-    }
+	public static String getVersion() {
+		final String version = CivSimBukkitPlugin.class.getPackage().getImplementationVersion();
+		return version == null ? "dev" : version;
+	}
 }
