@@ -2,10 +2,10 @@ package io.github.metriximor.civsimbukkit.services;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.models.Node;
+import io.github.metriximor.civsimbukkit.repositories.Repository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.block.Block;
-import org.bukkit.block.TileState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -19,73 +19,82 @@ import static io.github.metriximor.civsimbukkit.services.PersistentDataService.g
 public class NodeService {
     private final Logger logger;
     private final ItemSetService itemSetService;
+    private final Repository<Block, Node> nodeRepository;
 
-    //TODO move this set to a proper repository class
-    private final Set<Block> registeredNodes = new HashSet<>();
-
-    public Optional<Node> getNode(final Block block) {
-        return Node.make(block)
-                .filter(node -> node.getState().getPersistentDataContainer().has(PersistentDataService.getMarkerKey()));
+    public boolean blockIsNotNode(final Block block) {
+        return nodeRepository.getById(block).isEmpty();
     }
 
-    public void registerNode(@NonNull final Block block) {
-        if (!(block.getState() instanceof TileState state)) {
-            logger.severe("Attempted to register %s as a node despite it not being a tile-able block".formatted(block));
-            return;
-        }
-        setNodeMarker(state.getPersistentDataContainer());
-        state.update();
-
-        logger.info("Registered Node at %s".formatted(block.getLocation()));
-        registeredNodes.add(block);
+    public Optional<Node> registerNode(@NonNull final Block block) {
+        final var result = Node.make(block);
+        result.ifPresent(node -> {
+            logger.info("Registered Node at %s".formatted(block.getLocation()));
+            nodeRepository.add(block, node);
+        });
+        return result;
     }
 
     public void unregisterNode(@NonNull final Block block) {
-        if (!registeredNodes.remove(block)) {
+        if (!nodeRepository.remove(block)) {
             logger.severe("Failed to remove node from registered nodes: %s".formatted(block));
         }
     }
 
-    public void addWages(@NonNull final Node node, @NonNull final ItemStack wages) {
+    public boolean isEnabled(@NonNull final Block block) {
+        if (blockIsNotNode(block)) {
+            return false;
+        }
+        return nodeRepository.getById(block).orElseThrow().isEnabled();
+    }
+
+    public void addWages(@NonNull final Block block, @NonNull final ItemStack wages) {
         if (!itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, wages)) {
             return;
         }
-        logger.info("Writing wages to node %s".formatted(node));
+        if (isEnabled(block)) {
+            return;
+        }
+        final var node = nodeRepository.getById(block).orElseThrow();
+
         // Retrieve wage itemStacks from wages item
         final var wagesPdc = wages.getItemMeta().getPersistentDataContainer();
         final var wageItems = wagesPdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
+        if (wageItems == null || wageItems.isEmpty()) {
+            logger.warning("Wage config %s had no wages defined!".formatted(wages));
+            return;
+        }
 
-        logger.info("Wage items gotten: %s".formatted(wageItems));
-
-        // Add wage itemStacks to node
-        final var state = node.getState();
-        final var pdc = state.getPersistentDataContainer();
-        pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
-        state.update();
+        logger.info("Writing wages to node %s".formatted(node));
+        node.setWages(wageItems);
     }
 
-    public Optional<ItemStack> takeWages(@NonNull final Node node) {
-        final var wages = copyWages(node);
+    @NonNull
+    public Optional<ItemStack> takeWages(@NonNull final Block block) {
+        if (blockIsNotNode(block)) {
+            return Optional.empty();
+        }
+        final var node = nodeRepository.getById(block).orElseThrow();
+        if (node.isEnabled()) {
+            return Optional.empty();
+        }
+
+        final var wages = copyWages(block);
         if (wages.isEmpty()) {
             return Optional.empty();
         }
-        final var state = node.getState();
-        state.getPersistentDataContainer().remove(getWagesKey());
-        state.update();
+        node.removeWages();
         return wages;
     }
 
-    public Optional<ItemStack> copyWages(@NonNull final Node node) {
-        final var pdc = node.getState().getPersistentDataContainer();
-        if (!pdc.has(getWagesKey())) {
+    @NonNull
+    public Optional<ItemStack> copyWages(@NonNull final Block block) {
+        if (blockIsNotNode(block)) {
             return Optional.empty();
         }
-        final var wages = Objects.requireNonNull(pdc.get(getWagesKey(),
-                DataType.asList(DataType.ITEM_STACK)));
-        logger.info("Removing wages from node %s".formatted(node));
-        return Optional.of(itemSetService.createItemSetItemStack(
-                ItemSetService.SetType.WAGES,
-                wages));
+        final var node = nodeRepository.getById(block).orElseThrow();
+
+        final var wageItems = node.getWages();
+        return wageItems.map(itemStacks -> itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, itemStacks));
     }
 
     public void addMarker(@NonNull final ItemStack itemStack) {

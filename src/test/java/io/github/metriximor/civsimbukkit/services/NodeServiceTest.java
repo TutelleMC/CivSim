@@ -5,6 +5,7 @@ import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.WorldMock;
 import io.github.metriximor.civsimbukkit.models.Node;
+import io.github.metriximor.civsimbukkit.repositories.InMemoryNodeRepository;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Logger;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -26,7 +28,8 @@ import static org.mockito.Mockito.when;
 class NodeServiceTest {
     private final Logger logger = mock(Logger.class);
     private final ItemSetService itemSetService = mock(ItemSetService.class);
-    private final NodeService nodeService = new NodeService(logger, itemSetService);
+    private final InMemoryNodeRepository nodeRepository = new InMemoryNodeRepository();
+    private final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
     private WorldMock world;
 
     @BeforeEach
@@ -49,46 +52,53 @@ class NodeServiceTest {
     }
 
     @Test
-    void testGetNodeReturnsEmptyWhenMarkerIsMissing() {
+    void testBlockIsNotNodeDetectsNonBarrelsCorrectly() {
         final Block barrel = setupBarrelBlock();
-        assertTrue(nodeService.getNode(barrel).isEmpty());
+        assertTrue(nodeService.blockIsNotNode(barrel));
+    }
+
+    @Test
+    void testBlockIsNotNodeDetectsBarrelsCorrectly() {
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        assertFalse(nodeService.blockIsNotNode(barrel));
     }
 
     @Test
     void testRegisterNodeAddsMarker() {
         final Block barrel = setupBarrelBlock();
+        assertTrue(nodeService.registerNode(barrel).isPresent());
+    }
+
+    @Test
+    void testIsEnabledCorrectlyDetectsDisabledBarrels() {
+        final Block barrel = setupBarrelBlock();
+        assertFalse(nodeService.isEnabled(barrel));
         nodeService.registerNode(barrel);
-        assertTrue(nodeService.getNode(barrel).isPresent());
+        assertFalse(nodeService.isEnabled(barrel));
     }
 
     @Test
     void testWagesWorkCorrectly() {
-        final Node node = getNode();
-        assertTrue(nodeService.copyWages(node).isEmpty());
-        assertTrue(nodeService.takeWages(node).isEmpty());
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
+        assertTrue(nodeService.takeWages(barrel).isEmpty());
 
-        final List<ItemStack> paymentItems = getSampleWages();
-        final ItemStack wages = itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, paymentItems);
+        final ItemStack wages = getSampleWages();
 
-        nodeService.addWages(node, wages);
-        assertTrue(nodeService.copyWages(node).isPresent());
-        assertTrue(nodeService.takeWages(node).isPresent());
-        assertTrue(nodeService.copyWages(node).isEmpty());
+        nodeService.addWages(barrel, wages);
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        assertTrue(nodeService.takeWages(barrel).isPresent());
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
     }
 
     @NotNull
-    private List<ItemStack> getSampleWages() {
+    private ItemStack getSampleWages() {
         final List<ItemStack> paymentItems = List.of(new ItemStack(Material.IRON_INGOT, 2));
         when(itemSetService.createItemSetItemStack(any(), anyList())).thenCallRealMethod();
         when(itemSetService.isItemSetItemStack(any(), any())).thenCallRealMethod();
-        return paymentItems;
-    }
-
-    @NotNull
-    private Node getNode() {
-        final Block barrel = setupBarrelBlock();
-        nodeService.registerNode(barrel);
-        return nodeService.getNode(barrel).orElseThrow();
+        return itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, paymentItems);
     }
 
     @NotNull
