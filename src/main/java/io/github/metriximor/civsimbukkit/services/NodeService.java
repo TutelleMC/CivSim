@@ -104,6 +104,18 @@ public class NodeService {
         return wageItems.map(itemStacks -> itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, itemStacks));
     }
 
+    public void toggleNode(@NonNull final Block block) {
+        if (blockIsNotNode(block)) {
+            return;
+        }
+        final var node = nodeRepository.getById(block);
+        if (node == null) {
+            return;
+        }
+
+        node.toggle();
+    }
+
     public void addMarker(@NonNull final ItemStack itemStack) {
         itemStack.editMeta(meta -> setNodeMarker(meta.getPersistentDataContainer()));
     }

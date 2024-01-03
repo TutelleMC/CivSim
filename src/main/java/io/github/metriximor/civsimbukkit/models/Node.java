@@ -3,6 +3,7 @@ package io.github.metriximor.civsimbukkit.models;
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.services.PersistentDataService;
 import lombok.NonNull;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,7 @@ import static io.github.metriximor.civsimbukkit.services.PersistentDataService.g
 import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
 
 public final class Node {
-    private static final String ENABLED = "enabled";
+    private static final NamespacedKey ENABLED_KEY = getKey("enabled");
     private final @NonNull Block block;
 
     private Node(@NonNull Block block) {
@@ -30,7 +31,7 @@ public final class Node {
         final var pdc = state.getPersistentDataContainer();
         if (!pdc.has(PersistentDataService.getMarkerKey())) {
             pdc.set(PersistentDataService.getMarkerKey(), PersistentDataType.BYTE, (byte) 1);
-            pdc.set(PersistentDataService.getKey(ENABLED), DataType.BOOLEAN, false);
+            pdc.set(ENABLED_KEY, DataType.BOOLEAN, false);
             state.update();
         }
         return Optional.of(new Node(block));
@@ -44,12 +45,13 @@ public final class Node {
         return pdc.has(PersistentDataService.getMarkerKey());
     }
 
+    @NonNull
     public TileState getState() {
         return (TileState) block.getState();
     }
 
     public boolean isEnabled() {
-        return Optional.ofNullable(getState().getPersistentDataContainer().get(getKey(ENABLED), DataType.BOOLEAN))
+        return Optional.ofNullable(getState().getPersistentDataContainer().get(ENABLED_KEY, DataType.BOOLEAN))
                 .orElse(false);
     }
 
@@ -81,5 +83,12 @@ public final class Node {
         state.getPersistentDataContainer().remove(getWagesKey());
         state.update();
         return true;
+    }
+
+    public void toggle() {
+        final var state = getState();
+        final var pdc = state.getPersistentDataContainer();
+        final var toggleStatus = isEnabled();
+        pdc.set(ENABLED_KEY, DataType.BOOLEAN, !toggleStatus);
     }
 }

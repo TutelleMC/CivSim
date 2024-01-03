@@ -1,7 +1,6 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
 import io.github.metriximor.civsimbukkit.gui.items.ToggleItem;
-import io.github.metriximor.civsimbukkit.models.Node;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
@@ -18,16 +17,14 @@ public class UIController {
     public void openNodeUI(@NonNull final Player player,
                            @NonNull final Block block) {
         if (nodeService.blockIsNotNode(block)) {
+            player.sendMessage("%sToggling non toggleable block. Please contact an admin!".formatted(ChatColor.RED));
             return;
         }
-        final var node = Node.make(block);
-        if (node.isEmpty()) {
-            return;
-        }
+        final boolean isEnabled = nodeService.isEnabled(block);
 
         final Gui gui = Gui.normal()
                 .setStructure("T W . . . . . . .")
-                .addIngredient('T', new ToggleItem(node.get().isEnabled()))
+                .addIngredient('T', new ToggleItem(isEnabled, toggleCall -> nodeService.toggleNode(block) ))
                 .addIngredient('W', new SimpleItem(new ItemBuilder(Material.MAP)))
                 .build();
         Window.single()

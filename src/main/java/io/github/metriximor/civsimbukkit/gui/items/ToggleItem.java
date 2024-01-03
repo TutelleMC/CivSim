@@ -11,9 +11,18 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
+import java.util.function.Consumer;
+
 @AllArgsConstructor
 public class ToggleItem extends AbstractItem {
+    public record ToggleCall(ClickType clickType,
+                             Player player,
+                             InventoryClickEvent inventoryClickEvent,
+                             Boolean enabled) {
+    }
+
     private boolean enabled;
+    private Consumer<ToggleCall> supplier;
 
     @Override
     public ItemProvider getItemProvider() {
@@ -23,7 +32,7 @@ public class ToggleItem extends AbstractItem {
     @Override
     public void handleClick(@NotNull ClickType clickType, @NotNull Player player, @NotNull InventoryClickEvent event) {
         this.enabled = !enabled;
-        player.sendMessage("You just %s the Node!".formatted(enabled ? "enabled" : "disabled"));
+        supplier.accept(new ToggleCall(clickType, player, event, enabled));
         notifyWindows();
     }
 
