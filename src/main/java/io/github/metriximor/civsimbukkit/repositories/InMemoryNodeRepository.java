@@ -3,24 +3,25 @@ package io.github.metriximor.civsimbukkit.repositories;
 import io.github.metriximor.civsimbukkit.models.Node;
 import lombok.NonNull;
 import org.bukkit.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class InMemoryNodeRepository implements Repository<Block, Node> {
     private final Map<Block, Node> repo = new HashMap<>();
 
-    public Optional<Node> getById(@NonNull final Block block) {
+    @Nullable
+    public Node getById(@NonNull final Block block) {
         if (repo.containsKey(block)) {
-            return Optional.of(repo.get(block));
+            return repo.get(block);
         }
         if (Node.isNode(block)) {
             final var node = Node.make(block).orElseThrow();
             repo.put(block, node);
-            return Optional.of(node);
+            return node;
         }
-        return Optional.empty();
+        return null;
     }
 
     @Override

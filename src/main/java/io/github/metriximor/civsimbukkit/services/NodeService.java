@@ -22,7 +22,7 @@ public class NodeService {
     private final Repository<Block, Node> nodeRepository;
 
     public boolean blockIsNotNode(final Block block) {
-        return nodeRepository.getById(block).isEmpty();
+        return !Node.isNode(block);
     }
 
     public Optional<Node> registerNode(@NonNull final Block block) {
@@ -44,17 +44,21 @@ public class NodeService {
         if (blockIsNotNode(block)) {
             return false;
         }
-        return nodeRepository.getById(block).orElseThrow().isEnabled();
+        final var node = nodeRepository.getById(block);
+        if (node == null) {
+            return false;
+        }
+        return node.isEnabled();
     }
 
     public void addWages(@NonNull final Block block, @NonNull final ItemStack wages) {
         if (!itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, wages)) {
             return;
         }
-        if (isEnabled(block)) {
+        final var node = nodeRepository.getById(block);
+        if (node == null || node.isEnabled()) {
             return;
         }
-        final var node = nodeRepository.getById(block).orElseThrow();
 
         // Retrieve wage itemStacks from wages item
         final var wagesPdc = wages.getItemMeta().getPersistentDataContainer();
@@ -73,8 +77,8 @@ public class NodeService {
         if (blockIsNotNode(block)) {
             return Optional.empty();
         }
-        final var node = nodeRepository.getById(block).orElseThrow();
-        if (node.isEnabled()) {
+        final var node = nodeRepository.getById(block);
+        if (node == null || node.isEnabled()) {
             return Optional.empty();
         }
 
@@ -91,7 +95,10 @@ public class NodeService {
         if (blockIsNotNode(block)) {
             return Optional.empty();
         }
-        final var node = nodeRepository.getById(block).orElseThrow();
+        final var node = nodeRepository.getById(block);
+        if (node == null) {
+            return Optional.empty();
+        }
 
         final var wageItems = node.getWages();
         return wageItems.map(itemStacks -> itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, itemStacks));
