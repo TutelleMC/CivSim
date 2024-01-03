@@ -3,12 +3,11 @@ package io.github.metriximor.civsimbukkit.services;
 import io.github.metriximor.civsimbukkit.models.HeartBeat;
 import io.github.metriximor.civsimbukkit.models.Transaction;
 import io.github.metriximor.civsimbukkit.models.TransactionUpdate;
+import java.util.UUID;
+import java.util.logging.Logger;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.World;
-
-import java.util.UUID;
-import java.util.logging.Logger;
 
 @RequiredArgsConstructor
 public class SimulationService {
@@ -22,8 +21,7 @@ public class SimulationService {
         throw new UnsupportedOperationException();
     }
 
-    public boolean registerTransaction(@NonNull final UUID transactionId,
-                                       @NonNull final Transaction transaction) {
+    public boolean registerTransaction(@NonNull final UUID transactionId, @NonNull final Transaction transaction) {
         throw new UnsupportedOperationException();
     }
 

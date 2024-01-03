@@ -1,20 +1,19 @@
 package io.github.metriximor.civsimbukkit.models;
 
+import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getKey;
+import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
+
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.services.PersistentDataService;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.TileState;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getKey;
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
 
 public final class Node {
     private static final NamespacedKey ENABLED_KEY = getKey("enabled");

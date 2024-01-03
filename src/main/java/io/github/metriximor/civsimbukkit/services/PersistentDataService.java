@@ -1,9 +1,8 @@
 package io.github.metriximor.civsimbukkit.services;
 
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
-import org.bukkit.NamespacedKey;
-
 import java.util.Locale;
+import org.bukkit.NamespacedKey;
 
 public class PersistentDataService {
     public static NamespacedKey getMarkerKey() {

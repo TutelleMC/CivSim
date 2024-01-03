@@ -1,5 +1,6 @@
 package io.github.metriximor.civsimbukkit.gui.items;
 
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -11,14 +12,10 @@ import xyz.xenondevs.invui.item.ItemProvider;
 import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
-import java.util.function.Consumer;
-
 @AllArgsConstructor
 public class ToggleItem extends AbstractItem {
-    public record ToggleCall(ClickType clickType,
-                             Player player,
-                             InventoryClickEvent inventoryClickEvent,
-                             Boolean enabled) {
+    public record ToggleCall(ClickType clickType, Player player, InventoryClickEvent inventoryClickEvent,
+            Boolean enabled) {
     }
 
     private boolean enabled;
@@ -37,7 +34,8 @@ public class ToggleItem extends AbstractItem {
     }
 
     private ItemProvider getEnabled() {
-        return new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE).setDisplayName("%sEnabled".formatted(ChatColor.GREEN));
+        return new ItemBuilder(Material.GREEN_STAINED_GLASS_PANE)
+                .setDisplayName("%sEnabled".formatted(ChatColor.GREEN));
     }
 
     private ItemProvider getDisabled() {

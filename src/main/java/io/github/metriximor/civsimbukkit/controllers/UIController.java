@@ -16,23 +16,16 @@ import xyz.xenondevs.invui.window.Window;
 @RequiredArgsConstructor
 public class UIController {
     private final NodeService nodeService;
-    public void openNodeUI(@NonNull final Player player,
-                           @NonNull final Block block) {
+    public void openNodeUI(@NonNull final Player player, @NonNull final Block block) {
         if (nodeService.blockIsNotNode(block)) {
             player.sendMessage("%sToggling non toggleable block. Please contact an admin!".formatted(ChatColor.RED));
             return;
         }
         final boolean isEnabled = nodeService.isEnabled(block);
 
-        final Gui gui = Gui.normal()
-                .setStructure("T W . . . . . . .")
-                .addIngredient('T', new ToggleItem(isEnabled, toggleCall -> nodeService.toggleNode(block) ))
-                .addIngredient('W', new SimpleItem(new ItemBuilder(Material.MAP)))
-                .build();
-        Window.single()
-                .setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN))
-                .setGui(gui)
-                .build(player)
-                .open();
+        final Gui gui = Gui.normal().setStructure("T W . . . . . . .")
+                .addIngredient('T', new ToggleItem(isEnabled, toggleCall -> nodeService.toggleNode(block)))
+                .addIngredient('W', new SimpleItem(new ItemBuilder(Material.MAP))).build();
+        Window.single().setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN)).setGui(gui).build(player).open();
     }
 }

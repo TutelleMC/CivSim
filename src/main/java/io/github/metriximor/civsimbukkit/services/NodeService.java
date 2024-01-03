@@ -1,19 +1,18 @@
 package io.github.metriximor.civsimbukkit.services;
 
+import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
+
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.models.Node;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
+import java.util.*;
+import java.util.logging.Logger;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-
-import java.util.*;
-import java.util.logging.Logger;
-
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
 
 @RequiredArgsConstructor
 public class NodeService {
@@ -101,7 +100,8 @@ public class NodeService {
         }
 
         final var wageItems = node.getWages();
-        return wageItems.map(itemStacks -> itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, itemStacks));
+        return wageItems
+                .map(itemStacks -> itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, itemStacks));
     }
 
     public void toggleNode(@NonNull final Block block) {

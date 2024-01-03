@@ -9,12 +9,11 @@ import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
+import java.util.List;
+import java.util.logging.Logger;
 import org.bukkit.block.Block;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.List;
-import java.util.logging.Logger;
 
 @SuppressWarnings("unused")
 public class CivSimBukkitPlugin extends JavaPlugin {
@@ -31,9 +30,8 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         final Repository<Block, Node> nodeRepository = new InMemoryNodeRepository();
         final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
 
-        final CommandsService commandsService = new CommandsService(this, List.of(
-                new CivSimCommand(logger, nodeService, itemSetService)
-        ));
+        final CommandsService commandsService = new CommandsService(this,
+                List.of(new CivSimCommand(logger, nodeService, itemSetService)));
         final UIController uiController = new UIController(nodeService);
 
         // Register Events

@@ -1,12 +1,11 @@
 package io.github.metriximor.civsimbukkit.repositories;
 
 import io.github.metriximor.civsimbukkit.models.Node;
+import java.util.HashMap;
+import java.util.Map;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class InMemoryNodeRepository implements Repository<Block, Node> {
     private final Map<Block, Node> repo = new HashMap<>();

@@ -1,5 +1,7 @@
 package io.github.metriximor.civsimbukkit.commands;
 
+import static io.github.metriximor.civsimbukkit.services.ItemSetService.SetType.WAGES;
+
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
@@ -7,6 +9,10 @@ import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
 import io.github.metriximor.civsimbukkit.models.Nodes;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.logging.Logger;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -18,13 +24,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.logging.Logger;
-
-import static io.github.metriximor.civsimbukkit.services.ItemSetService.SetType.WAGES;
 
 @CommandAlias("civsim|csim")
 @RequiredArgsConstructor
@@ -41,7 +40,7 @@ public class CivSimCommand extends BaseCommand {
     }
 
     @Subcommand("buy")
-    @Description("TODO") //TODO finish this
+    @Description("TODO") // TODO finish this
     public void onBuy(@NonNull final Player player, @NonNull final Nodes node) {
         final var farmItem = new ItemStack(Material.BARREL, 1);
 
@@ -58,8 +57,8 @@ public class CivSimCommand extends BaseCommand {
     }
 
     @Subcommand("wages")
-    @Description("Wages are what specify how agents are paid when they complete a task.\n" +
-            "Farms, Factories and other buildings are configured with these")
+    @Description("Wages are what specify how agents are paid when they complete a task.\n"
+            + "Farms, Factories and other buildings are configured with these")
     public class WagesClass extends BaseCommand {
         @Subcommand("new")
         @Description("Configure wages to be paid on a workable block")
