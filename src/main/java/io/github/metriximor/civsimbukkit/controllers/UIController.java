@@ -3,6 +3,7 @@ package io.github.metriximor.civsimbukkit.controllers;
 import io.github.metriximor.civsimbukkit.gui.items.ToggleItem;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -12,8 +13,9 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
+@RequiredArgsConstructor
 public class UIController {
-    private NodeService nodeService;
+    private final NodeService nodeService;
     public void openNodeUI(@NonNull final Player player,
                            @NonNull final Block block) {
         if (nodeService.blockIsNotNode(block)) {

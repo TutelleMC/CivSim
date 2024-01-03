@@ -34,7 +34,7 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         final CommandsService commandsService = new CommandsService(this, List.of(
                 new CivSimCommand(logger, nodeService, itemSetService)
         ));
-        final UIController uiController = new UIController();
+        final UIController uiController = new UIController(nodeService);
 
         // Register Events
         pluginManager.registerEvents(new NodeListener(nodeService, itemSetService, uiController), this);

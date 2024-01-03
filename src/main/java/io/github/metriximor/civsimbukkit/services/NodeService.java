@@ -114,8 +114,10 @@ public class NodeService {
         }
 
         node.toggle();
+        logger.info("Node %s was toggled to %s".formatted(node, node.isEnabled()));
     }
 
+    // TODO move this to ItemSetService and ItemSet object
     public void addMarker(@NonNull final ItemStack itemStack) {
         itemStack.editMeta(meta -> setNodeMarker(meta.getPersistentDataContainer()));
     }
