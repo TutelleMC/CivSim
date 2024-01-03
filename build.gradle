@@ -103,6 +103,7 @@ spotless {
         eclipse()
     }
 }
+build.dependsOn spotlessApply
 
 compileJava {
     options.compilerArgs += ["-parameters"]
