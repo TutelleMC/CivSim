@@ -25,104 +25,104 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class NodeServiceTest {
-	private final Logger logger = mock(Logger.class);
-	private final ItemSetService itemSetService = mock(ItemSetService.class);
-	private final InMemoryNodeRepository nodeRepository = new InMemoryNodeRepository();
-	private final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
-	private WorldMock world;
+    private final Logger logger = mock(Logger.class);
+    private final ItemSetService itemSetService = mock(ItemSetService.class);
+    private final InMemoryNodeRepository nodeRepository = new InMemoryNodeRepository();
+    private final NodeService nodeService = new NodeService(logger, itemSetService, nodeRepository);
+    private WorldMock world;
 
-	@BeforeEach
-	void setup() {
-		ServerMock server = MockBukkit.mock();
-		MockBukkit.createMockPlugin("CivSimBukkit");
-		this.world = server.addSimpleWorld("world");
-	}
+    @BeforeEach
+    void setup() {
+        ServerMock server = MockBukkit.mock();
+        MockBukkit.createMockPlugin("CivSimBukkit");
+        this.world = server.addSimpleWorld("world");
+    }
 
-	@AfterEach
-	void destroy() {
-		MockBukkit.unmock();
-	}
+    @AfterEach
+    void destroy() {
+        MockBukkit.unmock();
+    }
 
-	@Test
-	void testNodeCreatesSuccessfully() {
-		final Block barrel = setupBarrelBlock();
-		final Optional<Node> node = Node.make(barrel);
-		assertTrue(node.isPresent());
-	}
+    @Test
+    void testNodeCreatesSuccessfully() {
+        final Block barrel = setupBarrelBlock();
+        final Optional<Node> node = Node.make(barrel);
+        assertTrue(node.isPresent());
+    }
 
-	@Test
-	void testBlockIsNotNodeDetectsNonBarrelsCorrectly() {
-		final Block barrel = setupBarrelBlock();
-		assertTrue(nodeService.blockIsNotNode(barrel));
-	}
+    @Test
+    void testBlockIsNotNodeDetectsNonBarrelsCorrectly() {
+        final Block barrel = setupBarrelBlock();
+        assertTrue(nodeService.blockIsNotNode(barrel));
+    }
 
-	@Test
-	void testBlockIsNotNodeDetectsBarrelsCorrectly() {
-		final Block barrel = setupBarrelBlock();
-		nodeService.registerNode(barrel);
-		assertFalse(nodeService.blockIsNotNode(barrel));
-	}
+    @Test
+    void testBlockIsNotNodeDetectsBarrelsCorrectly() {
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        assertFalse(nodeService.blockIsNotNode(barrel));
+    }
 
-	@Test
-	void testRegisterNodeAddsMarker() {
-		final Block barrel = setupBarrelBlock();
-		assertTrue(nodeService.registerNode(barrel).isPresent());
-	}
+    @Test
+    void testRegisterNodeAddsMarker() {
+        final Block barrel = setupBarrelBlock();
+        assertTrue(nodeService.registerNode(barrel).isPresent());
+    }
 
-	@Test
-	void testIsEnabledCorrectlyDetectsDisabledBarrels() {
-		final Block barrel = setupBarrelBlock();
-		assertFalse(nodeService.isEnabled(barrel));
-		nodeService.registerNode(barrel);
-		assertFalse(nodeService.isEnabled(barrel));
-	}
+    @Test
+    void testIsEnabledCorrectlyDetectsDisabledBarrels() {
+        final Block barrel = setupBarrelBlock();
+        assertFalse(nodeService.isEnabled(barrel));
+        nodeService.registerNode(barrel);
+        assertFalse(nodeService.isEnabled(barrel));
+    }
 
-	@Test
-	void testWagesWorkCorrectly() {
-		final Block barrel = setupBarrelBlock();
-		nodeService.registerNode(barrel);
-		assertTrue(nodeService.copyWages(barrel).isEmpty());
-		assertTrue(nodeService.takeWages(barrel).isEmpty());
+    @Test
+    void testWagesWorkCorrectly() {
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
+        assertTrue(nodeService.takeWages(barrel).isEmpty());
 
-		final ItemStack wages = getSampleWages();
+        final ItemStack wages = getSampleWages();
 
-		assertTrue(nodeService.addWages(barrel, wages));
-		assertTrue(nodeService.copyWages(barrel).isPresent());
-		assertTrue(nodeService.takeWages(barrel).isPresent());
-		assertTrue(nodeService.copyWages(barrel).isEmpty());
-	}
+        assertTrue(nodeService.addWages(barrel, wages));
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        assertTrue(nodeService.takeWages(barrel).isPresent());
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
+    }
 
-	@Test
-	void testCantChangeWagesWhenNodeIsEnabled() {
-		final Block barrel = setupBarrelBlock();
-		nodeService.registerNode(barrel);
-		final ItemStack wages = getSampleWages();
+    @Test
+    void testCantChangeWagesWhenNodeIsEnabled() {
+        final Block barrel = setupBarrelBlock();
+        nodeService.registerNode(barrel);
+        final ItemStack wages = getSampleWages();
 
-		nodeService.toggleNode(barrel);
-		assertFalse(nodeService.addWages(barrel, wages));
-		nodeService.toggleNode(barrel);
-		assertTrue(nodeService.addWages(barrel, wages));
-		assertTrue(nodeService.copyWages(barrel).isPresent());
-		nodeService.toggleNode(barrel);
-		assertTrue(nodeService.takeWages(barrel).isEmpty());
-		assertTrue(nodeService.copyWages(barrel).isPresent());
-		nodeService.toggleNode(barrel);
-		assertTrue(nodeService.takeWages(barrel).isPresent());
-		assertTrue(nodeService.copyWages(barrel).isEmpty());
-	}
+        nodeService.toggleNode(barrel);
+        assertFalse(nodeService.addWages(barrel, wages));
+        nodeService.toggleNode(barrel);
+        assertTrue(nodeService.addWages(barrel, wages));
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        nodeService.toggleNode(barrel);
+        assertTrue(nodeService.takeWages(barrel).isEmpty());
+        assertTrue(nodeService.copyWages(barrel).isPresent());
+        nodeService.toggleNode(barrel);
+        assertTrue(nodeService.takeWages(barrel).isPresent());
+        assertTrue(nodeService.copyWages(barrel).isEmpty());
+    }
 
-	@NotNull
-	private ItemStack getSampleWages() {
-		final List<ItemStack> paymentItems = List.of(new ItemStack(Material.IRON_INGOT, 2));
-		when(itemSetService.createItemSetItemStack(any(), anyList())).thenCallRealMethod();
-		when(itemSetService.isItemSetItemStack(any(), any())).thenCallRealMethod();
-		return itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, paymentItems);
-	}
+    @NotNull
+    private ItemStack getSampleWages() {
+        final List<ItemStack> paymentItems = List.of(new ItemStack(Material.IRON_INGOT, 2));
+        when(itemSetService.createItemSetItemStack(any(), anyList())).thenCallRealMethod();
+        when(itemSetService.isItemSetItemStack(any(), any())).thenCallRealMethod();
+        return itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, paymentItems);
+    }
 
-	@NotNull
-	private Block setupBarrelBlock() {
-		final Block barrel = world.createBlock(new Coordinate(0, 0, 0));
-		barrel.setType(Material.BARREL);
-		return barrel;
-	}
+    @NotNull
+    private Block setupBarrelBlock() {
+        final Block barrel = world.createBlock(new Coordinate(0, 0, 0));
+        barrel.setType(Material.BARREL);
+        return barrel;
+    }
 }

@@ -11,25 +11,25 @@ import org.bukkit.World;
 
 @RequiredArgsConstructor
 public class SimulationService {
-	private final Logger logger;
-	private final CommunicationService communicationService;
+    private final Logger logger;
+    private final CommunicationService communicationService;
 
-	public void sendHeartBeat(@NonNull final World world) {
-		final var worldTicks = world.getFullTime() / 20;
+    public void sendHeartBeat(@NonNull final World world) {
+        final var worldTicks = world.getFullTime() / 20;
 
-		final HeartBeat heartBeat = new HeartBeat(worldTicks);
-		throw new UnsupportedOperationException();
-	}
+        final HeartBeat heartBeat = new HeartBeat(worldTicks);
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean registerTransaction(@NonNull final UUID transactionId, @NonNull final Transaction transaction) {
-		throw new UnsupportedOperationException();
-	}
+    public boolean registerTransaction(@NonNull final UUID transactionId, @NonNull final Transaction transaction) {
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean unregisterTransaction(@NonNull final UUID transaction) {
-		throw new UnsupportedOperationException();
-	}
+    public boolean unregisterTransaction(@NonNull final UUID transaction) {
+        throw new UnsupportedOperationException();
+    }
 
-	public boolean updateTransactionStock(@NonNull final TransactionUpdate transactionUpdate) {
-		throw new UnsupportedOperationException();
-	}
+    public boolean updateTransactionStock(@NonNull final TransactionUpdate transactionUpdate) {
+        throw new UnsupportedOperationException();
+    }
 }

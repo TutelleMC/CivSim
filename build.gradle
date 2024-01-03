@@ -97,10 +97,10 @@ spotless {
     java {
         importOrder()
         removeUnusedImports()
-        indentWithSpaces()
         cleanthat().addMutator("SafeAndConsensual")
 
         eclipse()
+        indentWithSpaces()
     }
 }
 build.dependsOn spotlessApply

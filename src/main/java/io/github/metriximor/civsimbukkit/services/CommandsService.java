@@ -7,13 +7,13 @@ import lombok.NonNull;
 import org.bukkit.plugin.Plugin;
 
 public class CommandsService {
-	private final PaperCommandManager paperCommandManager;
+    private final PaperCommandManager paperCommandManager;
 
-	public CommandsService(@NonNull final Plugin plugin, @NonNull final List<BaseCommand> commands) {
-		this.paperCommandManager = new PaperCommandManager(plugin);
+    public CommandsService(@NonNull final Plugin plugin, @NonNull final List<BaseCommand> commands) {
+        this.paperCommandManager = new PaperCommandManager(plugin);
 
-		paperCommandManager.enableUnstableAPI("help");
+        paperCommandManager.enableUnstableAPI("help");
 
-		commands.forEach(paperCommandManager::registerCommand);
-	}
+        commands.forEach(paperCommandManager::registerCommand);
+    }
 }
