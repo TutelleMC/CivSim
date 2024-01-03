@@ -1,6 +1,7 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
+import io.github.metriximor.civsimbukkit.controllers.UIController;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 public class NodeListener implements Listener {
     private final NodeService nodeService;
     private final ItemSetService itemSetService;
+    private final UIController uiController;
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractWithNode(@NotNull final PlayerInteractEvent event) {
@@ -25,20 +27,17 @@ public class NodeListener implements Listener {
             return;
         }
 
-        final var node = nodeService.getNode(clickedBlock);
-        if (!event.getAction().isLeftClick() || node.isEmpty()) {
+        if (!event.getAction().isLeftClick() || nodeService.blockIsNotNode(clickedBlock)) {
             event.getPlayer().sendMessage("Not interacting with a node");
             return;
         }
 
         if (itemInHand.getType().equals(Material.STICK)) {
-            //TODO: open UI here
-            return;
+            uiController.openNodeUI(event.getPlayer(), clickedBlock);
         } else if (itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, itemInHand)) {
             event.getPlayer().sendMessage("Wages registered");
-            nodeService.addWages(node.get(), itemInHand);
+            nodeService.addWages(clickedBlock, itemInHand);
             event.getPlayer().getInventory().remove(itemInHand);
-            return;
         }
     }
 
@@ -53,7 +52,7 @@ public class NodeListener implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onNodeBeingDestroyed(@NotNull final BlockDestroyEvent event) {
-        if (nodeService.getNode(event.getBlock()).isEmpty()) {
+        if (nodeService.blockIsNotNode(event.getBlock())) {
             return;
         }
         nodeService.unregisterNode(event.getBlock());

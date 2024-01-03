@@ -4,7 +4,6 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
-import io.github.metriximor.civsimbukkit.models.Node;
 import io.github.metriximor.civsimbukkit.models.Nodes;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.NodeService;
@@ -60,9 +59,10 @@ public class CivSimCommand extends BaseCommand {
 
     @Subcommand("wages")
     @Description("Wages are what specify how agents are paid when they complete a task.\n" +
-            "Farms, Factories and other buildings are configured with these.")
+            "Farms, Factories and other buildings are configured with these")
     public class WagesClass extends BaseCommand {
         @Subcommand("new")
+        @Description("Configure wages to be paid on a workable block")
         public void onCreate(@NonNull final Player player, @NonNull Material material, int quantity) {
             logger.info("%s created a wages object".formatted(player.getName()));
             final var requiredItem = List.of(new ItemStack(material, quantity));
@@ -81,15 +81,14 @@ public class CivSimCommand extends BaseCommand {
             getWagesFromNode(player, nodeService::copyWages);
         }
 
-        private void getWagesFromNode(final Player player, Function<Node, Optional<ItemStack>> action) {
+        private void getWagesFromNode(final Player player, Function<Block, Optional<ItemStack>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
-            final var node = Node.make(blockLookedAt);
-            if (node.isEmpty()) {
+            if (nodeService.blockIsNotNode(blockLookedAt)) {
                 player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
                 return;
             }
 
-            final var wages = action.apply(node.get());
+            final var wages = action.apply(blockLookedAt);
             if (wages.isEmpty()) {
                 player.sendMessage("%sNode doesn't have wages".formatted(ChatColor.RED));
                 return;
