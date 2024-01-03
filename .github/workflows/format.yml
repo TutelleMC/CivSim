@@ -1,0 +1,28 @@
+name: Spotless Check and Apply
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  spotless:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+
+      - name: Change wrapper permissions
+        run: chmod +x ./gradlew
+
+      - name: Run spotlessCheck
+        id: spotlessCheck
+        run: ./gradlew spotlessCheck
+
+      - name: Run spotlessApply
+        if: failure()
+        run: ./gradlew spotlessApply && git diff --quiet && git checkout -b spotless-commit || git commit -am "Applied Spotless" && git push origin HEAD

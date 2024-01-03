@@ -3,6 +3,7 @@ plugins {
     id 'io.freefair.lombok' version '8.4'
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id "org.ajoberstar.reckon" version "0.18.1"
+    id "com.diffplug.spotless" version "6.23.3"
 }
 
 group 'io.github.metriximor'
@@ -85,6 +86,24 @@ test {
     useJUnitPlatform()
 }
 
+spotless {
+    format 'misc', {
+        target '*.gradle', '*.gitattributes', '*.gitignore', '*.yml'
+
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    java {
+        importOrder()
+        removeUnusedImports()
+        indentWithSpaces()
+        cleanthat().addMutator("SafeAndConsensual")
+
+        eclipse()
+    }
+}
+
 compileJava {
     options.compilerArgs += ["-parameters"]
 }
@@ -96,4 +115,3 @@ tasks.register('name') {
 tasks.register('proj_version') {
     println project.version
 }
-
