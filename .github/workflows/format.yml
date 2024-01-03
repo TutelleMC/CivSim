@@ -19,10 +19,9 @@ jobs:
       - name: Change wrapper permissions
         run: chmod +x ./gradlew
 
-      - name: Run spotlessCheck
-        id: spotlessCheck
-        run: ./gradlew spotlessCheck
+      - name: Format Code
+        run: ./gradlew spotlessApply
 
-      - name: Run spotlessApply
-        if: failure()
-        run: ./gradlew spotlessApply && git diff --quiet && git checkout -b spotless-commit || git commit -am "Applied Spotless" && git push origin HEAD
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Formatted Code"
