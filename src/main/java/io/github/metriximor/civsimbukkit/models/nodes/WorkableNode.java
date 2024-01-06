@@ -25,18 +25,6 @@ public class WorkableNode extends Node {
     }
 
     @Override
-    public boolean perform() {
-        var container = getContainer();
-        container.getInventory().addItem(new ItemStack(Material.WHEAT));
-        return container.update();
-    }
-
-    @Override
-    public @NotNull Transaction getTransaction() {
-        return new Transaction(List.of(), List.of(), 0, 0, 0);
-    }
-
-    @Override
     public void perform() {
         var container = getContainer();
         container.getInventory().addItem(new ItemStack(Material.WHEAT));
@@ -60,12 +48,13 @@ public class WorkableNode extends Node {
         return Optional.ofNullable(pdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK)));
     }
 
-    public void removeWages() {
+    public boolean removeWages() {
         if (isEnabled()) {
-            return;
+            return false;
         }
         final var state = getState();
         state.getPersistentDataContainer().remove(getWagesKey());
         state.update();
+        return true;
     }
 }
