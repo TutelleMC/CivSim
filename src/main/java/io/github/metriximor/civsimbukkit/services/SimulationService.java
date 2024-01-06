@@ -16,12 +16,16 @@ public class SimulationService {
     // private final CommunicationService communicationService;
     private final Plugin plugin;
     // TODO: this is a mock while the call is not implemented
-    private final Map<UUID, Node> registeredNodes;
+    private final Map<UUID, Node> registeredTransactions;
+    private final Set<UUID> queueToRemove;
+    private final Map<UUID, Node> queueToAdd;
 
     public SimulationService(final Logger logger, final Plugin plugin) {
         this.logger = logger;
         this.plugin = plugin;
-        this.registeredNodes = new HashMap<>();
+        this.registeredTransactions = new HashMap<>();
+        this.queueToAdd = new HashMap<>();
+        this.queueToRemove = new HashSet<>();
 
         new HeartbeatTask().runTaskTimerAsynchronously(plugin, 0, TimeUnit.SECONDS.convert(Duration.ofSeconds(5)));
     }
@@ -29,7 +33,10 @@ public class SimulationService {
     private class HeartbeatTask extends BukkitRunnable {
         @Override
         public void run() {
-            final var nodesToUpdate = registeredNodes.entrySet().stream()
+            registeredTransactions.putAll(queueToAdd);
+            queueToAdd.clear();
+
+            final var nodesToUpdate = registeredTransactions.entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> new Random().nextInt(3) + 1));
             new UpdateWorldBasedOnHeartBeatTask(nodesToUpdate).runTask(plugin);
         }
@@ -41,22 +48,44 @@ public class SimulationService {
         @Override
         public void run() {
             performedTransactions.forEach((id, usedStock) -> {
-                final var node = registeredNodes.get(id);
-                if (node.perform(usedStock)) {
-                    logger.info("Node %s performed %s times".formatted(node, usedStock));
-                } else {
-                    logger.severe("Failed to perform node %s %s times".formatted(node, usedStock));
+                final var node = registeredTransactions.get(id);
+                if (node == null) {
+                    logger.info(
+                            "Node %s performed %s times but it was disabled and couldn't".formatted(node, usedStock));
+                    return;
                 }
+                node.perform(usedStock);
             });
+            queueToRemove.forEach(registeredTransactions::remove);
+            queueToRemove.clear();
         }
     }
 
-    public void registerTransaction(@NonNull final Node node) {
-        registeredNodes.put(node.getNodeId(), node);
+    public boolean registerTransaction(@NonNull final Node node) {
+        if (registeredTransactions.containsKey(node.getNodeId())) {
+            logger.severe(
+                    "Attempted to register transaction of node %s that has registered transactions".formatted(node));
+            return false;
+        }
+
+        queueToAdd.put(node.getNodeId(), node);
+        logger.info("Queued up node %s to have the transaction registered".formatted(node));
+        return queueToAdd.containsKey(node.getNodeId());
     }
 
-    public void unregisterTransaction(@NonNull final Node node) {
-        registeredNodes.remove(node.getNodeId());
+    public boolean unregisterTransaction(@NonNull final Node node) {
+        if (queueToAdd.containsKey(node.getNodeId())) {
+            queueToAdd.remove(node.getNodeId());
+            return true;
+        }
+
+        if (!registeredTransactions.containsKey(node.getNodeId())) {
+            logger.severe("Attempted to unregister transaction of node %s that has no registered transactions"
+                    .formatted(node));
+            return false;
+        }
+        logger.info("Unregistered transaction for node %s".formatted(node));
+        return queueToRemove.add(node.getNodeId());
     }
 
     // public boolean updateTransactionStock(@NonNull final TransactionUpdate

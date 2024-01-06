@@ -27,8 +27,7 @@ public class WorkableNode extends Node {
     @Override
     public boolean perform() {
         var container = getContainer();
-        container.getInventory().addItem(new ItemStack(Material.WHEAT));
-        return container.update();
+        return container.getInventory().addItem(new ItemStack(Material.WHEAT)).isEmpty();
     }
 
     public boolean setWages(@NonNull final List<ItemStack> wageItems) {
