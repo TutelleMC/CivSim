@@ -6,9 +6,9 @@ import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
-import io.github.metriximor.civsimbukkit.models.Nodes;
+import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
-import io.github.metriximor.civsimbukkit.services.NodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
-    private final NodeService nodeService;
+    private final WorkableNodeService workableNodeService;
     private final ItemSetService itemSetService;
 
     @Subcommand("version")
@@ -41,10 +41,10 @@ public class CivSimCommand extends BaseCommand {
 
     @Subcommand("buy")
     @Description("TODO") // TODO finish this
-    public void onBuy(@NonNull final Player player, @NonNull final Nodes node) {
+    public void onBuy(@NonNull final Player player, @NonNull final NodeType node) {
         final var farmItem = new ItemStack(Material.BARREL, 1);
 
-        nodeService.addMarker(farmItem);
+        workableNodeService.addMarker(farmItem);
 
         // Change the name
         final var displayName = Component.text("Farm").color(NamedTextColor.DARK_GREEN);
@@ -71,18 +71,18 @@ public class CivSimCommand extends BaseCommand {
         @Subcommand("remove")
         @Description("Removes the wages from the block that is being looked at")
         public void onGet(@NonNull final Player player) {
-            getWagesFromNode(player, nodeService::takeWages);
+            getWagesFromNode(player, workableNodeService::takeWages);
         }
 
         @Subcommand("copy")
         @Description("Copies the wages from the block that is being looked at without erasing the block's wages")
         public void onCopy(@NonNull final Player player) {
-            getWagesFromNode(player, nodeService::copyWages);
+            getWagesFromNode(player, workableNodeService::copyWages);
         }
 
         private void getWagesFromNode(final Player player, Function<Block, Optional<ItemStack>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
-            if (nodeService.blockIsNotNode(blockLookedAt)) {
+            if (workableNodeService.blockIsNotNode(blockLookedAt)) {
                 player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
                 return;
             }

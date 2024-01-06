@@ -1,5 +1,5 @@
 package io.github.metriximor.civsimbukkit.models;
 
-public enum Nodes {
-    FARM
+public enum NodeType {
+    WORKABLE, SHOP
 }

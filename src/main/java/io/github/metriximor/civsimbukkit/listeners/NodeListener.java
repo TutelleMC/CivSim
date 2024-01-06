@@ -3,7 +3,7 @@ package io.github.metriximor.civsimbukkit.listeners;
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.github.metriximor.civsimbukkit.controllers.UIController;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
-import io.github.metriximor.civsimbukkit.services.NodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class NodeListener implements Listener {
-    private final NodeService nodeService;
+    private final WorkableNodeService workableNodeService;
     private final ItemSetService itemSetService;
     private final UIController uiController;
 
@@ -27,7 +27,7 @@ public class NodeListener implements Listener {
             return;
         }
 
-        if (!event.getAction().isLeftClick() || nodeService.blockIsNotNode(clickedBlock)) {
+        if (!event.getAction().isLeftClick() || workableNodeService.blockIsNotNode(clickedBlock)) {
             event.getPlayer().sendMessage("Not interacting with a node");
             return;
         }
@@ -36,7 +36,7 @@ public class NodeListener implements Listener {
             uiController.openNodeUI(event.getPlayer(), clickedBlock);
         } else if (itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, itemInHand)) {
             event.getPlayer().sendMessage("Wages registered");
-            nodeService.addWages(clickedBlock, itemInHand);
+            workableNodeService.addWages(clickedBlock, itemInHand);
             event.getPlayer().getInventory().remove(itemInHand);
         }
     }
@@ -45,16 +45,16 @@ public class NodeListener implements Listener {
     public void onPlayerPlaceNode(@NotNull final BlockPlaceEvent event) {
         final var itemStack = event.getItemInHand();
 
-        if (nodeService.hasMarker(itemStack)) {
-            nodeService.registerNode(event.getBlockPlaced());
+        if (workableNodeService.hasMarker(itemStack)) {
+            workableNodeService.registerNode(event.getBlockPlaced());
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onNodeBeingDestroyed(@NotNull final BlockDestroyEvent event) {
-        if (nodeService.blockIsNotNode(event.getBlock())) {
+        if (workableNodeService.blockIsNotNode(event.getBlock())) {
             return;
         }
-        nodeService.unregisterNode(event.getBlock());
+        workableNodeService.unregisterNode(event.getBlock());
     }
 }
