@@ -32,6 +32,7 @@ public class BukkitTest {
         barrel.setType(Material.BARREL);
         return barrel;
     }
+
     protected void tick(long amountOfTicks) {
         server.getScheduler().performTicks(amountOfTicks);
     }
