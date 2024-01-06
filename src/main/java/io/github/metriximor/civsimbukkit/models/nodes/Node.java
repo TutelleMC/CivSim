@@ -85,11 +85,13 @@ public abstract class Node {
     @NotNull
     public abstract Transaction getTransaction();
 
-    public void perform(final Integer timesPerformed) {
+    public boolean perform(final Integer timesPerformed) {
+        var result = false;
         for (int i = 0; i < timesPerformed; i += 1) {
-            perform();
+            result = perform();
         }
+        return result;
     }
 
-    public abstract void perform();
+    public abstract boolean perform();
 }

@@ -25,10 +25,10 @@ public class WorkableNode extends Node {
     }
 
     @Override
-    public void perform() {
+    public boolean perform() {
         var container = getContainer();
         container.getInventory().addItem(new ItemStack(Material.WHEAT));
-        container.update();
+        return container.update();
     }
 
     public boolean setWages(@NonNull final List<ItemStack> wageItems) {

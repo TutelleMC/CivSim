@@ -31,7 +31,7 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         final BukkitScheduler scheduler = this.getServer().getScheduler();
         final ItemSetService itemSetService = new ItemSetService();
         final Repository<Block, WorkableNode> workableNodeRepository = new InMemoryRepository<>();
-        final SimulationService simulationService = new SimulationService(logger, this, scheduler);
+        final SimulationService simulationService = new SimulationService(logger, this);
         final WorkableNodeService workableNodeService = new WorkableNodeService(logger, itemSetService,
                 workableNodeRepository, simulationService);
 

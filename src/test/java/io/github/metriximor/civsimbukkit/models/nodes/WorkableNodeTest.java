@@ -80,7 +80,7 @@ class WorkableNodeTest extends BukkitTest {
         final var node = setupWorkableNode(setupBarrelBlock());
 
         assertTrue(node.getContainer().getInventory().isEmpty());
-        node.perform(5);
+        assertTrue(node.perform(5));
         assertFalse(node.getContainer().getInventory().isEmpty());
     }
 

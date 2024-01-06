@@ -10,7 +10,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.bukkit.scheduler.BukkitScheduler;
 
 public class SimulationService {
     private final Logger logger;
@@ -19,7 +18,7 @@ public class SimulationService {
     // TODO: this is a mock while the call is not implemented
     private final Map<UUID, Node> registeredNodes;
 
-    public SimulationService(final Logger logger, final Plugin plugin, final BukkitScheduler scheduler) {
+    public SimulationService(final Logger logger, final Plugin plugin) {
         this.logger = logger;
         this.plugin = plugin;
         this.registeredNodes = new HashMap<>();
@@ -43,8 +42,11 @@ public class SimulationService {
         public void run() {
             performedTransactions.forEach((id, usedStock) -> {
                 final var node = registeredNodes.get(id);
-                node.perform(usedStock);
-                logger.info("Node %s performed %s times".formatted(node, usedStock));
+                if (node.perform(usedStock)) {
+                    logger.info("Node %s performed %s times".formatted(node, usedStock));
+                } else {
+                    logger.severe("Failed to perform node %s %s times".formatted(node, usedStock));
+                }
             });
         }
     }
