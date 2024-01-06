@@ -6,6 +6,7 @@ import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.PersistentDataService;
+import io.github.metriximor.civsimbukkit.services.SimulationService;
 import java.util.*;
 import java.util.logging.Logger;
 import lombok.AccessLevel;
@@ -26,6 +27,7 @@ public abstract class NodeService<T extends Node> {
     private final ItemSetService itemSetService;
     private final Repository<Block, T> nodeRepository;
     private final NodeType serviceNodeType;
+    private final SimulationService simulationService;
 
     public boolean blockIsNotNode(final Block block) {
         return !Node.isNode(block);
@@ -81,7 +83,12 @@ public abstract class NodeService<T extends Node> {
             return;
         }
 
-        node.toggle();
+        final var enabled = node.toggle();
+        if (enabled) {
+            simulationService.registerTransaction(node);
+        } else {
+            simulationService.unregisterTransaction(node);
+        }
         logger.info("Node %s was toggled to %s".formatted(node, node.isEnabled()));
     }
 

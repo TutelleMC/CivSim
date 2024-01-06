@@ -20,7 +20,7 @@ import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
 @RequiredArgsConstructor
-public class UIController {
+public class FarmUIController {
     private final WorkableNodeService workableNodeService;
 
     public void openNodeUI(@NonNull final Player player, @NonNull final Block block) {

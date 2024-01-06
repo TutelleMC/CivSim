@@ -7,6 +7,7 @@ import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.WorkableNode;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
+import io.github.metriximor.civsimbukkit.services.SimulationService;
 import java.util.Optional;
 import java.util.logging.Logger;
 import lombok.NonNull;
@@ -15,8 +16,8 @@ import org.bukkit.inventory.ItemStack;
 
 public class WorkableNodeService extends NodeService<WorkableNode> {
     public WorkableNodeService(final Logger logger, final ItemSetService itemSetService,
-            final Repository<Block, WorkableNode> nodeRepository) {
-        super(logger, itemSetService, nodeRepository, NodeType.WORKABLE);
+            final Repository<Block, WorkableNode> nodeRepository, final SimulationService simulationService) {
+        super(logger, itemSetService, nodeRepository, NodeType.WORKABLE, simulationService);
     }
 
     public boolean addWages(@NonNull final Block block, @NonNull final ItemStack wages) {
