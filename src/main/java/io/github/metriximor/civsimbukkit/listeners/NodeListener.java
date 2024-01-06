@@ -1,10 +1,11 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
-import io.github.metriximor.civsimbukkit.controllers.UIController;
+import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
 import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 public class NodeListener implements Listener {
     private final WorkableNodeService workableNodeService;
     private final ItemSetService itemSetService;
-    private final UIController uiController;
+    private final FarmUIController farmUiController;
 
     @EventHandler(ignoreCancelled = true)
     public void onPlayerInteractWithNode(@NotNull final PlayerInteractEvent event) {
@@ -33,7 +34,7 @@ public class NodeListener implements Listener {
         }
 
         if (itemInHand.getType().equals(Material.STICK)) {
-            uiController.openNodeUI(event.getPlayer(), clickedBlock);
+            farmUiController.openNodeUI(event.getPlayer(), clickedBlock);
         } else if (itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, itemInHand)) {
             event.getPlayer().sendMessage("Wages registered");
             workableNodeService.addWages(clickedBlock, itemInHand);
@@ -46,6 +47,7 @@ public class NodeListener implements Listener {
         final var itemStack = event.getItemInHand();
 
         if (workableNodeService.hasMarker(itemStack)) {
+            event.getPlayer().sendMessage("%sYou just placed a Farm!".formatted(ChatColor.GREEN));
             workableNodeService.registerNode(event.getBlockPlaced());
         }
     }

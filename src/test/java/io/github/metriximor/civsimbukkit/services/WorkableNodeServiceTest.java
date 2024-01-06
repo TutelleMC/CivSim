@@ -28,9 +28,10 @@ import org.junit.jupiter.api.Test;
 class WorkableNodeServiceTest {
     private final Logger logger = mock(Logger.class);
     private final ItemSetService itemSetService = mock(ItemSetService.class);
+    private final SimulationService simulationService = mock(SimulationService.class);
     private final InMemoryRepository<Block, WorkableNode> nodeRepository = spy(new InMemoryRepository<>());
     private final WorkableNodeService workableNodeService = new WorkableNodeService(logger, itemSetService,
-            nodeRepository);
+            nodeRepository, simulationService);
     private WorldMock world;
 
     @BeforeEach

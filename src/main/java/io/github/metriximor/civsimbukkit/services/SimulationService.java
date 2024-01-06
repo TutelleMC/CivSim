@@ -1,35 +1,64 @@
 package io.github.metriximor.civsimbukkit.services;
 
-import io.github.metriximor.civsimbukkit.models.HeartBeat;
-import io.github.metriximor.civsimbukkit.models.Transaction;
-import io.github.metriximor.civsimbukkit.models.TransactionUpdate;
-import java.util.UUID;
+import io.github.metriximor.civsimbukkit.models.nodes.Node;
+import java.time.Duration;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.World;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitScheduler;
 
-@RequiredArgsConstructor
 public class SimulationService {
     private final Logger logger;
-    private final CommunicationService communicationService;
+    // private final CommunicationService communicationService;
+    private final Plugin plugin;
+    // TODO: this is a mock while the call is not implemented
+    private final Map<UUID, Node> registeredNodes;
 
-    public void sendHeartBeat(@NonNull final World world) {
-        final var worldTicks = world.getFullTime() / 20;
+    public SimulationService(final Logger logger, final Plugin plugin, final BukkitScheduler scheduler) {
+        this.logger = logger;
+        this.plugin = plugin;
+        this.registeredNodes = new HashMap<>();
 
-        final HeartBeat heartBeat = new HeartBeat(worldTicks);
-        throw new UnsupportedOperationException();
+        new HeartbeatTask().runTaskTimerAsynchronously(plugin, 0, TimeUnit.SECONDS.convert(Duration.ofSeconds(5)));
     }
 
-    public boolean registerTransaction(@NonNull final UUID transactionId, @NonNull final Transaction transaction) {
-        throw new UnsupportedOperationException();
+    private class HeartbeatTask extends BukkitRunnable {
+        @Override
+        public void run() {
+            final var nodesToUpdate = registeredNodes.entrySet().stream()
+                    .collect(Collectors.toMap(Map.Entry::getKey, e -> new Random().nextInt(3) + 1));
+            new UpdateWorldBasedOnHeartBeatTask(nodesToUpdate).runTask(plugin);
+        }
     }
 
-    public boolean unregisterTransaction(@NonNull final UUID transaction) {
-        throw new UnsupportedOperationException();
+    @RequiredArgsConstructor
+    private class UpdateWorldBasedOnHeartBeatTask extends BukkitRunnable {
+        private final Map<UUID, Integer> performedTransactions;
+        @Override
+        public void run() {
+            performedTransactions.forEach((id, usedStock) -> {
+                final var node = registeredNodes.get(id);
+                node.perform(usedStock);
+                logger.info("Node %s performed %s times".formatted(node, usedStock));
+            });
+        }
     }
 
-    public boolean updateTransactionStock(@NonNull final TransactionUpdate transactionUpdate) {
-        throw new UnsupportedOperationException();
+    public void registerTransaction(@NonNull final Node node) {
+        registeredNodes.put(node.getNodeId(), node);
     }
+
+    public void unregisterTransaction(@NonNull final Node node) {
+        registeredNodes.remove(node.getNodeId());
+    }
+
+    // public boolean updateTransactionStock(@NonNull final TransactionUpdate
+    // transactionUpdate) {
+    // throw new UnsupportedOperationException();
+    // }
 }
