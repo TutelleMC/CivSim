@@ -17,7 +17,7 @@ public class ShopNode extends Node {
     }
 
     @Override
-    public boolean perform() {
+    public void perform() {
         throw new UnsupportedOperationException("TODO");
     }
 }

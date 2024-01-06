@@ -31,6 +31,18 @@ public class WorkableNode extends Node {
         return container.update();
     }
 
+    @Override
+    public @NotNull Transaction getTransaction() {
+        return new Transaction(List.of(), List.of(), 0, 0, 0);
+    }
+
+    @Override
+    public void perform() {
+        var container = getContainer();
+        container.getInventory().addItem(new ItemStack(Material.WHEAT));
+        container.update();
+    }
+
     public boolean setWages(@NonNull final List<ItemStack> wageItems) {
         if (isEnabled()) {
             return false;
@@ -48,13 +60,12 @@ public class WorkableNode extends Node {
         return Optional.ofNullable(pdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK)));
     }
 
-    public boolean removeWages() {
+    public void removeWages() {
         if (isEnabled()) {
-            return false;
+            return;
         }
         final var state = getState();
         state.getPersistentDataContainer().remove(getWagesKey());
         state.update();
-        return true;
     }
 }
