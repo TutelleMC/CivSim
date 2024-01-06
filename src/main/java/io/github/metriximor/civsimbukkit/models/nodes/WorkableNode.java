@@ -17,7 +17,6 @@ import org.jetbrains.annotations.NotNull;
 public class WorkableNode extends Node {
     WorkableNode(@NonNull final Block block, @NonNull final NodeType nodeType) {
         super(block, nodeType);
-        setWages(List.of());
     }
 
     @Override
@@ -49,12 +48,13 @@ public class WorkableNode extends Node {
         return Optional.ofNullable(pdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK)));
     }
 
-    public void removeWages() {
+    public boolean removeWages() {
         if (isEnabled()) {
-            return;
+            return false;
         }
         final var state = getState();
         state.getPersistentDataContainer().remove(getWagesKey());
         state.update();
+        return true;
     }
 }
