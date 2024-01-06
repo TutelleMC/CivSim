@@ -55,6 +55,7 @@ public abstract class Node {
         return state.getPersistentDataContainer().get(TYPE_KEY, DataType.asEnum(NodeType.class));
     }
 
+    @NonNull
     public UUID getNodeId() {
         return uuid;
     }
