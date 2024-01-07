@@ -99,7 +99,8 @@ spotless {
         removeUnusedImports()
         cleanthat().addMutator("SafeAndConsensual")
 
-        eclipse()
+
+        palantirJavaFormat()
         indentWithSpaces()
     }
 }

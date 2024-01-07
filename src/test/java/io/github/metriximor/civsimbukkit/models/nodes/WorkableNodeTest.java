@@ -3,8 +3,9 @@ package io.github.metriximor.civsimbukkit.models.nodes;
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import java.util.List;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import lombok.NonNull;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,20 +23,22 @@ class WorkableNodeTest extends BukkitTest {
     void testWagesWorksCorrectly() {
         final var block = setupBarrelBlock();
         final var node = setupWorkableNode(block);
+        final var wages = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);
+        wages.add(new ItemStack(Material.IRON_INGOT));
 
         assertTrue(node.getWages().isEmpty());
-        assertTrue(node.setWages(List.of(new ItemStack(Material.IRON_INGOT))));
+        assertTrue(node.setWages(wages));
         assertTrue(node.getWages().isPresent());
         assertTrue(node.removeWages());
         assertTrue(node.getWages().isEmpty());
 
         node.toggle();
         node.toggle();
-        assertTrue(node.setWages(List.of(new ItemStack(Material.IRON_INGOT))));
+        assertTrue(node.setWages(wages));
         node.toggle();
 
         assertTrue(node.getWages().isPresent());
-        assertFalse(node.setWages(List.of(new ItemStack(Material.IRON_INGOT))));
+        assertFalse(node.setWages(wages));
         assertTrue(node.getWages().isPresent());
         assertFalse(node.removeWages());
         assertTrue(node.getWages().isPresent());

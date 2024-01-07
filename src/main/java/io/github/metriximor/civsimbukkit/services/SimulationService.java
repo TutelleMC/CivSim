@@ -45,6 +45,7 @@ public class SimulationService {
     @RequiredArgsConstructor
     private class UpdateWorldBasedOnHeartBeatTask extends BukkitRunnable {
         private final Map<UUID, Integer> performedTransactions;
+
         @Override
         public void run() {
             performedTransactions.forEach((id, usedStock) -> {

@@ -2,7 +2,8 @@ package io.github.metriximor.civsimbukkit.listeners;
 
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
@@ -16,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class NodeListener implements Listener {
     private final WorkableNodeService workableNodeService;
-    private final ItemSetService itemSetService;
+    private final BillOfMaterialsService billOfMaterialsService;
     private final FarmUIController farmUiController;
 
     @EventHandler(ignoreCancelled = true)
@@ -35,10 +36,15 @@ public class NodeListener implements Listener {
 
         if (itemInHand.getType().equals(Material.STICK)) {
             farmUiController.openNodeUI(event.getPlayer(), clickedBlock);
-        } else if (itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, itemInHand)) {
-            event.getPlayer().sendMessage("Wages registered");
-            workableNodeService.addWages(clickedBlock, itemInHand);
+        } else if (billOfMaterialsService.isItemSetItemStack(BillOfMaterialsService.SetType.WAGES, itemInHand)) {
+            final var wages = BillOfMaterials.fromItemstack(BillOfMaterialsService.SetType.WAGES, itemInHand);
+            if (wages.isEmpty()) {
+                event.getPlayer().sendMessage("%sWages invalid".formatted(ChatColor.RED));
+                return;
+            }
+            workableNodeService.addWages(clickedBlock, wages.get());
             event.getPlayer().getInventory().remove(itemInHand);
+            event.getPlayer().sendMessage("%sWages registered".formatted(ChatColor.GREEN));
         }
     }
 

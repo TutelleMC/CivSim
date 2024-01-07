@@ -30,6 +30,9 @@ class SimulationServiceTest extends BukkitTest {
 
     @NonNull
     private Node setupNode() {
-        return Objects.requireNonNull(new NodeBuilder().type(NodeType.WORKABLE).block(setupBarrelBlock()).build());
+        return Objects.requireNonNull(new NodeBuilder()
+                .type(NodeType.WORKABLE)
+                .block(setupBarrelBlock())
+                .build());
     }
 }

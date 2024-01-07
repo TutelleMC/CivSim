@@ -1,12 +1,13 @@
 package io.github.metriximor.civsimbukkit.models.nodes;
 
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getWagesKey;
+import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getWagesKey;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.Transaction;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -30,21 +31,30 @@ public class WorkableNode extends Node {
         return container.getInventory().addItem(new ItemStack(Material.WHEAT)).isEmpty();
     }
 
-    public boolean setWages(@NonNull final List<ItemStack> wageItems) {
+    public boolean setWages(@NonNull final BillOfMaterials wageItems) {
         if (isEnabled()) {
             return false;
         }
         final var state = getState();
         final var pdc = state.getPersistentDataContainer();
-        pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), Objects.requireNonNull(wageItems));
+        pdc.set(getWagesKey(), DataType.asList(DataType.ITEM_STACK), wageItems.getContentsList());
         state.update();
         return true;
     }
 
     @NonNull
-    public Optional<List<ItemStack>> getWages() {
+    public Optional<BillOfMaterials> getWages() {
         final var pdc = getState().getPersistentDataContainer();
-        return Optional.ofNullable(pdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK)));
+        // TODO: Make bill a serializable type to avoid this nonsense
+        final var wages = pdc.get(getWagesKey(), DataType.asList(DataType.ITEM_STACK));
+        if (wages == null) {
+            return Optional.empty();
+        }
+        final var bill = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);
+        if (!bill.addAll(wages)) {
+            return Optional.empty();
+        }
+        return Optional.of(bill);
     }
 
     public boolean removeWages() {

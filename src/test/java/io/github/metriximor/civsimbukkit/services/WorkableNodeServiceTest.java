@@ -2,17 +2,16 @@ package io.github.metriximor.civsimbukkit.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
 import io.github.metriximor.civsimbukkit.models.nodes.WorkableNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
-import java.util.List;
 import java.util.logging.Logger;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,15 +21,17 @@ import org.junit.jupiter.api.Test;
 
 class WorkableNodeServiceTest extends BukkitTest {
     private final Logger logger = mock(Logger.class);
-    private final ItemSetService itemSetService = mock(ItemSetService.class);
+    private final BillOfMaterialsService billOfMaterialsService = mock(BillOfMaterialsService.class);
     private final SimulationService simulationService = mock(SimulationService.class);
     private final InMemoryRepository<Block, WorkableNode> nodeRepository = spy(new InMemoryRepository<>());
-    private final WorkableNodeService workableNodeService = new WorkableNodeService(logger, itemSetService,
-            nodeRepository, simulationService);
+    private final WorkableNodeService workableNodeService =
+            new WorkableNodeService(logger, billOfMaterialsService, nodeRepository, simulationService);
+
     @Test
     void testNodeCreatesSuccessfully() {
         final Block barrel = setupBarrelBlock();
-        final Node node = new NodeBuilder().type(NodeType.WORKABLE).block(barrel).build();
+        final Node node =
+                new NodeBuilder().type(NodeType.WORKABLE).block(barrel).build();
         assertNotNull(node);
     }
 
@@ -85,7 +86,7 @@ class WorkableNodeServiceTest extends BukkitTest {
         assertTrue(workableNodeService.copyWages(barrel).isEmpty());
         assertTrue(workableNodeService.takeWages(barrel).isEmpty());
 
-        final ItemStack wages = getSampleWages();
+        final var wages = getSampleWages();
 
         assertTrue(workableNodeService.addWages(barrel, wages));
         assertTrue(workableNodeService.copyWages(barrel).isPresent());
@@ -97,7 +98,7 @@ class WorkableNodeServiceTest extends BukkitTest {
     void testCantChangeWagesWhenNodeIsEnabled() {
         final Block barrel = setupBarrelBlock();
         workableNodeService.registerNode(barrel);
-        final ItemStack wages = getSampleWages();
+        final var wages = getSampleWages();
 
         workableNodeService.toggleNode(barrel);
         assertFalse(workableNodeService.addWages(barrel, wages));
@@ -113,10 +114,9 @@ class WorkableNodeServiceTest extends BukkitTest {
     }
 
     @NotNull
-    private ItemStack getSampleWages() {
-        final List<ItemStack> paymentItems = List.of(new ItemStack(Material.IRON_INGOT, 2));
-        when(itemSetService.createItemSetItemStack(any(), anyList())).thenCallRealMethod();
-        when(itemSetService.isItemSetItemStack(any(), any())).thenCallRealMethod();
-        return itemSetService.createItemSetItemStack(ItemSetService.SetType.WAGES, paymentItems);
+    private BillOfMaterials getSampleWages() {
+        final var bill = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);
+        bill.add(new ItemStack(Material.IRON_INGOT, 2));
+        return bill;
     }
 }

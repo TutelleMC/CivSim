@@ -6,8 +6,8 @@ import io.github.metriximor.civsimbukkit.listeners.NodeListener;
 import io.github.metriximor.civsimbukkit.models.nodes.WorkableNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.List;
@@ -29,18 +29,19 @@ public class CivSimBukkitPlugin extends JavaPlugin {
 
         // Service Instantiation
         final BukkitScheduler scheduler = this.getServer().getScheduler();
-        final ItemSetService itemSetService = new ItemSetService();
+        final BillOfMaterialsService billOfMaterialsService = new BillOfMaterialsService();
         final Repository<Block, WorkableNode> workableNodeRepository = new InMemoryRepository<>();
         final SimulationService simulationService = new SimulationService(logger, this);
-        final WorkableNodeService workableNodeService = new WorkableNodeService(logger, itemSetService,
-                workableNodeRepository, simulationService);
+        final WorkableNodeService workableNodeService =
+                new WorkableNodeService(logger, billOfMaterialsService, workableNodeRepository, simulationService);
 
-        final CommandsService commandsService = new CommandsService(this,
-                List.of(new CivSimCommand(logger, workableNodeService, itemSetService)));
+        final CommandsService commandsService = new CommandsService(
+                this, List.of(new CivSimCommand(logger, workableNodeService, billOfMaterialsService)));
         final FarmUIController farmUiController = new FarmUIController(workableNodeService);
 
         // Register Events
-        pluginManager.registerEvents(new NodeListener(workableNodeService, itemSetService, farmUiController), this);
+        pluginManager.registerEvents(
+                new NodeListener(workableNodeService, billOfMaterialsService, farmUiController), this);
 
         logger.info("CivSimBukkit Plugin loaded successfully");
     }

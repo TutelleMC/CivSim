@@ -4,9 +4,9 @@ import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
-import io.github.metriximor.civsimbukkit.services.PersistentDataService;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
+import io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils;
 import java.util.*;
 import java.util.logging.Logger;
 import lombok.AccessLevel;
@@ -23,8 +23,10 @@ import org.jetbrains.annotations.Nullable;
 public abstract class NodeService<T extends Node> {
     @Getter(AccessLevel.PACKAGE)
     private final Logger logger;
+
     @Getter(AccessLevel.PACKAGE)
-    private final ItemSetService itemSetService;
+    private final BillOfMaterialsService billOfMaterialsService;
+
     private final Repository<Block, T> nodeRepository;
     private final NodeType serviceNodeType;
     private final SimulationService simulationService;
@@ -98,10 +100,10 @@ public abstract class NodeService<T extends Node> {
     }
 
     public boolean hasMarker(@NonNull final ItemStack itemStack) {
-        return itemStack.getItemMeta().getPersistentDataContainer().has(PersistentDataService.getMarkerKey());
+        return itemStack.getItemMeta().getPersistentDataContainer().has(NamespacedKeyUtils.getMarkerKey());
     }
 
     private void setNodeMarker(final PersistentDataContainer persistentDataContainer) {
-        persistentDataContainer.set(PersistentDataService.getMarkerKey(), PersistentDataType.BYTE, (byte) 1);
+        persistentDataContainer.set(NamespacedKeyUtils.getMarkerKey(), PersistentDataType.BYTE, (byte) 1);
     }
 }

@@ -1,12 +1,12 @@
 package io.github.metriximor.civsimbukkit.models.nodes;
 
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getKey;
-import static io.github.metriximor.civsimbukkit.services.PersistentDataService.getMarkerKey;
+import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getKey;
+import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getMarkerKey;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.Transaction;
-import io.github.metriximor.civsimbukkit.services.UUIDService;
+import io.github.metriximor.civsimbukkit.utils.UUIDUtils;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
@@ -36,7 +36,7 @@ public abstract class Node {
             state.update();
         }
         this.block = block;
-        this.uuid = UUIDService.generateUUID(block.getLocation());
+        this.uuid = UUIDUtils.generateUUID(block.getLocation());
     }
 
     public static boolean isNode(final Block block) {

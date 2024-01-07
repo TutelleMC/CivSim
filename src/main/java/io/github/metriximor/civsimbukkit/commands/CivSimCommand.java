@@ -1,13 +1,14 @@
 package io.github.metriximor.civsimbukkit.commands;
 
-import static io.github.metriximor.civsimbukkit.services.ItemSetService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.List;
 import java.util.Optional;
@@ -25,13 +26,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-@CommandAlias("civsim|csim")
+@CommandAlias("civsim|csim|cim")
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
     private final WorkableNodeService workableNodeService;
-    private final ItemSetService itemSetService;
+    private final BillOfMaterialsService billOfMaterialsService;
 
     @Subcommand("version")
     @Description("The version command displays the currently installed version of CivSim")
@@ -65,7 +66,7 @@ public class CivSimCommand extends BaseCommand {
         public void onCreate(@NonNull final Player player, @NonNull Material material, int quantity) {
             logger.info("%s created a wages object".formatted(player.getName()));
             final var requiredItem = List.of(new ItemStack(material, quantity));
-            giveItemToPlayer(player, itemSetService.createItemSetItemStack(WAGES, requiredItem));
+            giveItemToPlayer(player, billOfMaterialsService.createItemSetItemStack(WAGES, requiredItem));
         }
 
         @Subcommand("remove")
@@ -80,7 +81,7 @@ public class CivSimCommand extends BaseCommand {
             getWagesFromNode(player, workableNodeService::copyWages);
         }
 
-        private void getWagesFromNode(final Player player, Function<Block, Optional<ItemStack>> action) {
+        private void getWagesFromNode(final Player player, Function<Block, Optional<BillOfMaterials>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
             if (workableNodeService.blockIsNotNode(blockLookedAt)) {
                 player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
@@ -92,7 +93,7 @@ public class CivSimCommand extends BaseCommand {
                 player.sendMessage("%sNode doesn't have wages".formatted(ChatColor.RED));
                 return;
             }
-            giveItemToPlayer(player, wages.get());
+            giveItemToPlayer(player, wages.map(BillOfMaterials::getAsItem).get());
         }
     }
 
