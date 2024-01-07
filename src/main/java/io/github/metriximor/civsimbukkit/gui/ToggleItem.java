@@ -1,4 +1,4 @@
-package io.github.metriximor.civsimbukkit.gui.items;
+package io.github.metriximor.civsimbukkit.gui;
 
 import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
@@ -14,9 +14,8 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 @AllArgsConstructor
 public class ToggleItem extends AbstractItem {
-    public record ToggleCall(ClickType clickType, Player player, InventoryClickEvent inventoryClickEvent,
-            Boolean enabled) {
-    }
+    public record ToggleCall(
+            ClickType clickType, Player player, InventoryClickEvent inventoryClickEvent, Boolean enabled) {}
 
     private boolean enabled;
     private Consumer<ToggleCall> supplier;

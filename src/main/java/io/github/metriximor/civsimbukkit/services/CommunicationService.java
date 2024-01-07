@@ -1,5 +1,3 @@
 package io.github.metriximor.civsimbukkit.services;
 
-public interface CommunicationService {
-
-}
+public interface CommunicationService {}

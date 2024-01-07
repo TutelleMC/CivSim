@@ -1,13 +1,15 @@
 package io.github.metriximor.civsimbukkit.commands;
 
-import static io.github.metriximor.civsimbukkit.services.ItemSetService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
 import co.aikar.commands.annotation.*;
 import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -25,13 +26,13 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-@CommandAlias("civsim|csim")
+@CommandAlias("civsim|csim|cim")
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
     private final WorkableNodeService workableNodeService;
-    private final ItemSetService itemSetService;
+    private final BillOfMaterialsService billOfMaterialsService;
 
     @Subcommand("version")
     @Description("The version command displays the currently installed version of CivSim")
@@ -63,9 +64,14 @@ public class CivSimCommand extends BaseCommand {
         @Subcommand("new")
         @Description("Configure wages to be paid on a workable block")
         public void onCreate(@NonNull final Player player, @NonNull Material material, int quantity) {
-            logger.info("%s created a wages object".formatted(player.getName()));
             final var requiredItem = List.of(new ItemStack(material, quantity));
-            giveItemToPlayer(player, itemSetService.createItemSetItemStack(WAGES, requiredItem));
+            final var wagesItem = billOfMaterialsService.createItemSetItemStack(WAGES, requiredItem);
+            if (wagesItem == null) {
+                player.sendMessage(getFailMessage("Couldn't create wages object"));
+                return;
+            }
+            giveItemToPlayer(player, wagesItem);
+            logger.info("%s created a wages object".formatted(player.getName()));
         }
 
         @Subcommand("remove")
@@ -80,19 +86,19 @@ public class CivSimCommand extends BaseCommand {
             getWagesFromNode(player, workableNodeService::copyWages);
         }
 
-        private void getWagesFromNode(final Player player, Function<Block, Optional<ItemStack>> action) {
+        private void getWagesFromNode(final Player player, Function<Block, Optional<BillOfMaterials>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
             if (workableNodeService.blockIsNotNode(blockLookedAt)) {
-                player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
+                player.sendMessage(getFailMessage("You must be looking at a workable building block"));
                 return;
             }
 
             final var wages = action.apply(blockLookedAt);
             if (wages.isEmpty()) {
-                player.sendMessage("%sNode doesn't have wages".formatted(ChatColor.RED));
+                player.sendMessage(getFailMessage("Node doesn't have wages"));
                 return;
             }
-            giveItemToPlayer(player, wages.get());
+            giveItemToPlayer(player, wages.map(BillOfMaterials::getAsItem).get());
         }
     }
 

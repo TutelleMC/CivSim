@@ -1,11 +1,14 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
+
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
-import io.github.metriximor.civsimbukkit.services.ItemSetService;
+import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
+import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 @RequiredArgsConstructor
 public class NodeListener implements Listener {
     private final WorkableNodeService workableNodeService;
-    private final ItemSetService itemSetService;
+    private final BillOfMaterialsService billOfMaterialsService;
     private final FarmUIController farmUiController;
 
     @EventHandler(ignoreCancelled = true)
@@ -29,16 +32,24 @@ public class NodeListener implements Listener {
         }
 
         if (!event.getAction().isLeftClick() || workableNodeService.blockIsNotNode(clickedBlock)) {
-            event.getPlayer().sendMessage("Not interacting with a node");
+            event.getPlayer().sendMessage(getFailMessage("Not interacting with a node"));
             return;
         }
 
         if (itemInHand.getType().equals(Material.STICK)) {
             farmUiController.openNodeUI(event.getPlayer(), clickedBlock);
-        } else if (itemSetService.isItemSetItemStack(ItemSetService.SetType.WAGES, itemInHand)) {
-            event.getPlayer().sendMessage("Wages registered");
-            workableNodeService.addWages(clickedBlock, itemInHand);
-            event.getPlayer().getInventory().remove(itemInHand);
+        } else if (billOfMaterialsService.isItemSetItemStack(BillOfMaterialsService.SetType.WAGES, itemInHand)) {
+            final var wages = BillOfMaterials.fromItemStack(BillOfMaterialsService.SetType.WAGES, itemInHand);
+            if (wages.isEmpty()) {
+                event.getPlayer().sendMessage(getFailMessage("Wages invalid, can hold only a max of 9 stacks"));
+                return;
+            }
+            if (workableNodeService.addWages(clickedBlock, wages.get())) {
+                event.getPlayer().getInventory().remove(itemInHand);
+                event.getPlayer().sendMessage(getSuccessMessage("Wages registered"));
+            } else {
+                event.getPlayer().sendMessage(getFailMessage("Failed to register wages"));
+            }
         }
     }
 
@@ -47,7 +58,7 @@ public class NodeListener implements Listener {
         final var itemStack = event.getItemInHand();
 
         if (workableNodeService.hasMarker(itemStack)) {
-            event.getPlayer().sendMessage("%sYou just placed a Farm!".formatted(ChatColor.GREEN));
+            event.getPlayer().sendMessage(getSuccessMessage("You just placed a Farm!"));
             workableNodeService.registerNode(event.getBlockPlaced());
         }
     }

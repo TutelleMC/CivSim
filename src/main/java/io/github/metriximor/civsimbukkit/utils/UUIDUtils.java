@@ -1,4 +1,4 @@
-package io.github.metriximor.civsimbukkit.services;
+package io.github.metriximor.civsimbukkit.utils;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
@@ -6,7 +6,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.UUID;
 
-public class UUIDService {
+public class UUIDUtils {
     public static UUID generateUUID(Object obj) {
         MessageDigest md;
         try {
@@ -24,5 +24,4 @@ public class UUIDService {
 
         return new UUID(mostSigBits, 0);
     }
-
 }
