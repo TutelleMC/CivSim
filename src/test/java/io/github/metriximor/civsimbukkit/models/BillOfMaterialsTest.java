@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
+import java.util.ArrayList;
 import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -24,6 +25,10 @@ class BillOfMaterialsTest extends BukkitTest {
     void testAddAllWorksCorrectly() {
         assertTrue(setupBill().addAll(List.of(new ItemStack(Material.IRON_INGOT, 64))));
         assertFalse(setupBill().addAll(List.of(new ItemStack(Material.DIAMOND_SHOVEL, 10))));
+
+        final var listOfNulls = new ArrayList<ItemStack>();
+        listOfNulls.add(null);
+        assertFalse(setupBill().addAll(listOfNulls));
     }
 
     @Test

@@ -9,7 +9,6 @@ import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.utils.StringUtils;
 import java.util.*;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -45,6 +44,9 @@ public class BillOfMaterials {
     }
 
     public boolean addAll(@NonNull final List<ItemStack> list) {
+        if (list.stream().anyMatch(Objects::isNull)) {
+            return false;
+        }
         return list.stream().allMatch(this::add);
     }
 
@@ -98,7 +100,7 @@ public class BillOfMaterials {
 
     @NonNull
     private Stream<ItemStack> getContents() {
-        return StreamSupport.stream(Spliterators.spliteratorUnknownSize(bill.iterator(), Spliterator.ORDERED), false);
+        return Arrays.stream(bill.getContents()).filter(Objects::nonNull);
     }
 
     @NonNull

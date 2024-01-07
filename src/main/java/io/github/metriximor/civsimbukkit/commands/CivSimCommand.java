@@ -1,6 +1,7 @@
 package io.github.metriximor.civsimbukkit.commands;
 
 import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
@@ -18,7 +19,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
@@ -64,9 +64,14 @@ public class CivSimCommand extends BaseCommand {
         @Subcommand("new")
         @Description("Configure wages to be paid on a workable block")
         public void onCreate(@NonNull final Player player, @NonNull Material material, int quantity) {
-            logger.info("%s created a wages object".formatted(player.getName()));
             final var requiredItem = List.of(new ItemStack(material, quantity));
-            giveItemToPlayer(player, billOfMaterialsService.createItemSetItemStack(WAGES, requiredItem));
+            final var wagesItem = billOfMaterialsService.createItemSetItemStack(WAGES, requiredItem);
+            if (wagesItem == null) {
+                player.sendMessage(getFailMessage("Couldn't create wages object"));
+                return;
+            }
+            giveItemToPlayer(player, wagesItem);
+            logger.info("%s created a wages object".formatted(player.getName()));
         }
 
         @Subcommand("remove")
@@ -84,13 +89,13 @@ public class CivSimCommand extends BaseCommand {
         private void getWagesFromNode(final Player player, Function<Block, Optional<BillOfMaterials>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
             if (workableNodeService.blockIsNotNode(blockLookedAt)) {
-                player.sendMessage("%sYou must be looking at a workable building block".formatted(ChatColor.RED));
+                player.sendMessage(getFailMessage("You must be looking at a workable building block"));
                 return;
             }
 
             final var wages = action.apply(blockLookedAt);
             if (wages.isEmpty()) {
-                player.sendMessage("%sNode doesn't have wages".formatted(ChatColor.RED));
+                player.sendMessage(getFailMessage("Node doesn't have wages"));
                 return;
             }
             giveItemToPlayer(player, wages.map(BillOfMaterials::getAsItem).get());
