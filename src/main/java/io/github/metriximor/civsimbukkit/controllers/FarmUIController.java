@@ -1,12 +1,13 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
 import io.github.metriximor.civsimbukkit.gui.ToggleItem;
-import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.List;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -31,13 +32,16 @@ public class FarmUIController {
 
         final var wagesLore = workableNodeService
                 .copyWages(block)
-                .map(BillOfMaterials::describe)
-                .orElse(List.of(Component.text("No wages configured!")))
+                .map(bill -> bill.describe().stream()
+                        .map(component -> component.decorate(TextDecoration.ITALIC))
+                        .toList())
+                .orElse(List.of(Component.text("No wages configured!").color(NamedTextColor.RED)))
                 .stream()
                 .map(component -> (ComponentWrapper) new AdventureComponentWrapper(component))
                 .toList();
-        final var wagesItem = new SimpleItem(
-                new ItemBuilder(Material.PAPER).addLoreLines(wagesLore).setDisplayName("Wages"));
+        final var wagesItem = new SimpleItem(new ItemBuilder(Material.PAPER)
+                .addLoreLines(wagesLore)
+                .setDisplayName("%sWages".formatted(ChatColor.DARK_PURPLE)));
 
         final Gui gui = Gui.normal()
                 .setStructure("T W . . . . . . .")
