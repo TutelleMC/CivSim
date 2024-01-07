@@ -37,7 +37,7 @@ public class NodeListener implements Listener {
         if (itemInHand.getType().equals(Material.STICK)) {
             farmUiController.openNodeUI(event.getPlayer(), clickedBlock);
         } else if (billOfMaterialsService.isItemSetItemStack(BillOfMaterialsService.SetType.WAGES, itemInHand)) {
-            final var wages = BillOfMaterials.fromItemstack(BillOfMaterialsService.SetType.WAGES, itemInHand);
+            final var wages = BillOfMaterials.fromItemStack(BillOfMaterialsService.SetType.WAGES, itemInHand);
             if (wages.isEmpty()) {
                 event.getPlayer().sendMessage("%sWages invalid".formatted(ChatColor.RED));
                 return;

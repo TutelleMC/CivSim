@@ -7,10 +7,7 @@ import static io.github.metriximor.civsimbukkit.utils.StringUtils.convertToTitle
 import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.utils.StringUtils;
-import java.util.List;
-import java.util.Optional;
-import java.util.Spliterator;
-import java.util.Spliterators;
+import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import lombok.NonNull;
@@ -29,7 +26,7 @@ public class BillOfMaterials {
     private final Inventory bill = Bukkit.createInventory(null, 9);
 
     @NonNull
-    public static Optional<BillOfMaterials> fromItemstack(
+    public static Optional<BillOfMaterials> fromItemStack(
             final BillOfMaterialsService.SetType type, final ItemStack itemStack) {
         final var bill = new BillOfMaterials(type);
         final var pdc = itemStack.getItemMeta().getPersistentDataContainer();
@@ -66,7 +63,8 @@ public class BillOfMaterials {
 
     @NonNull
     public List<Component> describe() {
-        return getContents().map(BillOfMaterials::describeQuantityAndNameOf).toList();
+        return new ArrayList<>(
+                getContents().map(BillOfMaterials::describeQuantityAndNameOf).toList());
     }
 
     @NonNull
@@ -93,7 +91,7 @@ public class BillOfMaterials {
     }
 
     @NonNull
-    private static Component describeQuantityAndNameOf(ItemStack itemStack) {
+    private static Component describeQuantityAndNameOf(@NonNull ItemStack itemStack) {
         final String name = convertToTitleCaseSplitting(itemStack.getType().toString(), "_");
         return Component.text("%s - %s".formatted(itemStack.getAmount(), name));
     }
