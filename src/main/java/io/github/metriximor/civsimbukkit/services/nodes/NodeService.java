@@ -2,7 +2,7 @@ package io.github.metriximor.civsimbukkit.services.nodes;
 
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
+import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
@@ -41,7 +41,7 @@ public abstract class NodeService<T extends Node> {
         if (result != null) {
             return result;
         }
-        final T node = new NodeBuilder().block(block).type(serviceNodeType).build();
+        final T node = NodeFactory.build(block, serviceNodeType);
         if (node == null) {
             return null;
         }
@@ -50,7 +50,7 @@ public abstract class NodeService<T extends Node> {
     }
 
     public Optional<T> registerNode(@NonNull final Block block) {
-        final T result = new NodeBuilder().type(NodeType.WORKABLE).block(block).build();
+        final T result = NodeFactory.build(block, NodeType.FARM);
         if (result == null) {
             return Optional.empty();
         }

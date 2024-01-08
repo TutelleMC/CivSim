@@ -16,7 +16,7 @@ class FarmNodeTest extends BukkitTest {
     @Test
     void testNodeConstructsSuccessfully() {
         final var block = setupBarrelBlock();
-        assertNotNull(new NodeBuilder().type(NodeType.WORKABLE).block(block).build());
+        assertNotNull(NodeFactory.build(block, NodeType.FARM));
     }
 
     @Test
@@ -88,6 +88,6 @@ class FarmNodeTest extends BukkitTest {
     }
 
     private FarmNode setupWorkableNode(@NonNull final Block block) {
-        return new NodeBuilder().type(NodeType.WORKABLE).block(block).build();
+        return NodeFactory.build(block, NodeType.FARM);
     }
 }

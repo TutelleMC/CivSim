@@ -7,11 +7,11 @@ import static org.mockito.Mockito.*;
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.nodes.Node;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
 import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
+import io.github.metriximor.civsimbukkit.models.nodes.Node;
+import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -24,93 +24,92 @@ class FarmNodeServiceTest extends BukkitTest {
     private final BillOfMaterialsService billOfMaterialsService = mock(BillOfMaterialsService.class);
     private final SimulationService simulationService = mock(SimulationService.class);
     private final InMemoryRepository<Block, FarmNode> nodeRepository = spy(new InMemoryRepository<>());
-    private final WorkableNodeService workableNodeService =
-            new WorkableNodeService(logger, billOfMaterialsService, nodeRepository, simulationService);
+    private final FarmNodeService farmNodeService =
+            new FarmNodeService(logger, billOfMaterialsService, nodeRepository, simulationService);
 
     @Test
     void testNodeCreatesSuccessfully() {
         final Block barrel = setupBarrelBlock();
-        final Node node =
-                new NodeBuilder().type(NodeType.WORKABLE).block(barrel).build();
+        final Node node = NodeFactory.build(barrel, NodeType.FARM);
         assertNotNull(node);
     }
 
     @Test
     void testBlockIsNotNodeDetectsNonBarrelsCorrectly() {
         final Block barrel = setupBarrelBlock();
-        assertTrue(workableNodeService.blockIsNotNode(barrel));
+        assertTrue(farmNodeService.blockIsNotNode(barrel));
     }
 
     @Test
     void testBlockIsNotNodeDetectsBarrelsCorrectly() {
         final Block barrel = setupBarrelBlock();
-        workableNodeService.registerNode(barrel);
-        assertFalse(workableNodeService.blockIsNotNode(barrel));
+        farmNodeService.registerNode(barrel);
+        assertFalse(farmNodeService.blockIsNotNode(barrel));
     }
 
     @Test
     void testRegisterNodeAddsMarker() {
         final Block barrel = setupBarrelBlock();
-        assertTrue(workableNodeService.registerNode(barrel).isPresent());
+        assertTrue(farmNodeService.registerNode(barrel).isPresent());
     }
 
     @Test
     void testIsEnabledCorrectlyDetectsDisabledBarrels() {
         final Block barrel = setupBarrelBlock();
-        assertFalse(workableNodeService.isEnabled(barrel));
-        workableNodeService.registerNode(barrel);
-        assertFalse(workableNodeService.isEnabled(barrel));
+        assertFalse(farmNodeService.isEnabled(barrel));
+        farmNodeService.registerNode(barrel);
+        assertFalse(farmNodeService.isEnabled(barrel));
     }
 
     @Test
     void testGetNodeCanGetBlocksThatAreMissingFromTheRepo() {
         final Block barrel = setupBarrelBlock();
-        workableNodeService.registerNode(barrel);
-        assertNotNull(workableNodeService.getNode(barrel));
+        farmNodeService.registerNode(barrel);
+        assertNotNull(farmNodeService.getNode(barrel));
         doReturn(null).when(nodeRepository).getById(barrel);
-        assertNotNull(workableNodeService.getNode(barrel));
+        assertNotNull(farmNodeService.getNode(barrel));
         verify(nodeRepository, times(2)).add(eq(barrel), any());
     }
 
     @Test
     void testGetNodeReturnsNullWhenMismatchedTypesAreGotten() {
         final Block barrel = setupBarrelBlock();
-        new NodeBuilder().block(barrel).type(NodeType.SHOP).build();
-        assertNull(workableNodeService.getNode(barrel));
+        NodeFactory.build(barrel, NodeType.SHOP);
+        assertNull(farmNodeService.getNode(barrel));
     }
 
     @Test
     void testWagesWorkCorrectly() {
         final Block barrel = setupBarrelBlock();
-        workableNodeService.registerNode(barrel);
-        assertTrue(workableNodeService.copyWages(barrel).isEmpty());
-        assertTrue(workableNodeService.takeWages(barrel).isEmpty());
+        farmNodeService.registerNode(barrel);
+        assertTrue(farmNodeService.copyWages(barrel).isEmpty());
+        assertTrue(farmNodeService.takeWages(barrel).isEmpty());
 
         final var wages = getSampleWages();
 
-        assertTrue(workableNodeService.addWages(barrel, wages));
-        assertTrue(workableNodeService.copyWages(barrel).isPresent());
-        assertTrue(workableNodeService.takeWages(barrel).isPresent());
-        assertTrue(workableNodeService.copyWages(barrel).isEmpty());
+        assertTrue(farmNodeService.addWages(barrel, wages));
+        assertTrue(farmNodeService.copyWages(barrel).isPresent());
+        assertTrue(farmNodeService.takeWages(barrel).isPresent());
+        assertTrue(farmNodeService.copyWages(barrel).isEmpty());
     }
 
     @Test
     void testCantChangeWagesWhenNodeIsEnabled() {
         final Block barrel = setupBarrelBlock();
-        workableNodeService.registerNode(barrel);
+        farmNodeService.registerNode(barrel);
         final var wages = getSampleWages();
 
-        workableNodeService.toggleNode(barrel);
-        assertFalse(workableNodeService.addWages(barrel, wages));
-        workableNodeService.toggleNode(barrel);
-        assertTrue(workableNodeService.addWages(barrel, wages));
-        assertTrue(workableNodeService.copyWages(barrel).isPresent());
-        workableNodeService.toggleNode(barrel);
-        assertTrue(workableNodeService.takeWages(barrel).isEmpty());
-        assertTrue(workableNodeService.copyWages(barrel).isPresent());
-        workableNodeService.toggleNode(barrel);
-        assertTrue(workableNodeService.takeWages(barrel).isPresent());
-        assertTrue(workableNodeService.copyWages(barrel).isEmpty());
+        farmNodeService.toggleNode(barrel);
+        assertFalse(farmNodeService.addWages(barrel, wages));
+        farmNodeService.toggleNode(barrel);
+        assertTrue(farmNodeService.addWages(barrel, wages));
+        assertTrue(farmNodeService.copyWages(barrel).isPresent());
+        farmNodeService.toggleNode(barrel);
+        assertTrue(farmNodeService.takeWages(barrel).isEmpty());
+        assertTrue(farmNodeService.copyWages(barrel).isPresent());
+        farmNodeService.toggleNode(barrel);
+        assertTrue(farmNodeService.takeWages(barrel).isPresent());
+        assertTrue(farmNodeService.copyWages(barrel).isEmpty());
     }
 
     @NotNull

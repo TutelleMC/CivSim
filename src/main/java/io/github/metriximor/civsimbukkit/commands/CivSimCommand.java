@@ -10,7 +10,7 @@ import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
-    private final WorkableNodeService workableNodeService;
+    private final FarmNodeService farmNodeService;
     private final BillOfMaterialsService billOfMaterialsService;
 
     @Subcommand("version")
@@ -45,7 +45,7 @@ public class CivSimCommand extends BaseCommand {
     public void onBuy(@NonNull final Player player, @NonNull final NodeType node) {
         final var farmItem = new ItemStack(Material.BARREL, 1);
 
-        workableNodeService.addMarker(farmItem);
+        farmNodeService.addMarker(farmItem);
 
         // Change the name
         final var displayName = Component.text("Farm").color(NamedTextColor.DARK_GREEN);
@@ -77,18 +77,18 @@ public class CivSimCommand extends BaseCommand {
         @Subcommand("remove")
         @Description("Removes the wages from the block that is being looked at")
         public void onGet(@NonNull final Player player) {
-            getWagesFromNode(player, workableNodeService::takeWages);
+            getWagesFromNode(player, farmNodeService::takeWages);
         }
 
         @Subcommand("copy")
         @Description("Copies the wages from the block that is being looked at without erasing the block's wages")
         public void onCopy(@NonNull final Player player) {
-            getWagesFromNode(player, workableNodeService::copyWages);
+            getWagesFromNode(player, farmNodeService::copyWages);
         }
 
         private void getWagesFromNode(final Player player, Function<Block, Optional<BillOfMaterials>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
-            if (workableNodeService.blockIsNotNode(blockLookedAt)) {
+            if (farmNodeService.blockIsNotNode(blockLookedAt)) {
                 player.sendMessage(getFailMessage("You must be looking at a workable building block"));
                 return;
             }

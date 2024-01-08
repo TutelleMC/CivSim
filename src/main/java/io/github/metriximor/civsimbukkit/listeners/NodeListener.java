@@ -7,7 +7,7 @@ import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class NodeListener implements Listener {
-    private final WorkableNodeService workableNodeService;
+    private final FarmNodeService farmNodeService;
     private final BillOfMaterialsService billOfMaterialsService;
     private final FarmUIController farmUiController;
 
@@ -31,7 +31,7 @@ public class NodeListener implements Listener {
             return;
         }
 
-        if (!event.getAction().isLeftClick() || workableNodeService.blockIsNotNode(clickedBlock)) {
+        if (!event.getAction().isLeftClick() || farmNodeService.blockIsNotNode(clickedBlock)) {
             event.getPlayer().sendMessage(getFailMessage("Not interacting with a node"));
             return;
         }
@@ -44,7 +44,7 @@ public class NodeListener implements Listener {
                 event.getPlayer().sendMessage(getFailMessage("Wages invalid, can hold only a max of 9 stacks"));
                 return;
             }
-            if (workableNodeService.addWages(clickedBlock, wages.get())) {
+            if (farmNodeService.addWages(clickedBlock, wages.get())) {
                 event.getPlayer().getInventory().remove(itemInHand);
                 event.getPlayer().sendMessage(getSuccessMessage("Wages registered"));
             } else {
@@ -57,17 +57,17 @@ public class NodeListener implements Listener {
     public void onPlayerPlaceNode(@NotNull final BlockPlaceEvent event) {
         final var itemStack = event.getItemInHand();
 
-        if (workableNodeService.hasMarker(itemStack)) {
+        if (farmNodeService.hasMarker(itemStack)) {
             event.getPlayer().sendMessage(getSuccessMessage("You just placed a Farm!"));
-            workableNodeService.registerNode(event.getBlockPlaced());
+            farmNodeService.registerNode(event.getBlockPlaced());
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onNodeBeingDestroyed(@NotNull final BlockDestroyEvent event) {
-        if (workableNodeService.blockIsNotNode(event.getBlock())) {
+        if (farmNodeService.blockIsNotNode(event.getBlock())) {
             return;
         }
-        workableNodeService.unregisterNode(event.getBlock());
+        farmNodeService.unregisterNode(event.getBlock());
     }
 }

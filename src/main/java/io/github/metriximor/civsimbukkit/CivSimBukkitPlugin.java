@@ -9,7 +9,7 @@ import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.List;
 import java.util.logging.Logger;
 import org.bukkit.block.Block;
@@ -32,16 +32,15 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         final BillOfMaterialsService billOfMaterialsService = new BillOfMaterialsService();
         final Repository<Block, FarmNode> workableNodeRepository = new InMemoryRepository<>();
         final SimulationService simulationService = new SimulationService(logger, this);
-        final WorkableNodeService workableNodeService =
-                new WorkableNodeService(logger, billOfMaterialsService, workableNodeRepository, simulationService);
+        final FarmNodeService farmNodeService =
+                new FarmNodeService(logger, billOfMaterialsService, workableNodeRepository, simulationService);
 
-        final CommandsService commandsService = new CommandsService(
-                this, List.of(new CivSimCommand(logger, workableNodeService, billOfMaterialsService)));
-        final FarmUIController farmUiController = new FarmUIController(workableNodeService);
+        final CommandsService commandsService =
+                new CommandsService(this, List.of(new CivSimCommand(logger, farmNodeService, billOfMaterialsService)));
+        final FarmUIController farmUiController = new FarmUIController(farmNodeService);
 
         // Register Events
-        pluginManager.registerEvents(
-                new NodeListener(workableNodeService, billOfMaterialsService, farmUiController), this);
+        pluginManager.registerEvents(new NodeListener(farmNodeService, billOfMaterialsService, farmUiController), this);
 
         logger.info("CivSimBukkit Plugin loaded successfully");
     }

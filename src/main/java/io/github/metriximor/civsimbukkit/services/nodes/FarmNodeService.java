@@ -11,13 +11,13 @@ import java.util.logging.Logger;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 
-public class WorkableNodeService extends NodeService<FarmNode> {
-    public WorkableNodeService(
+public class FarmNodeService extends NodeService<FarmNode> {
+    public FarmNodeService(
             final Logger logger,
             final BillOfMaterialsService billOfMaterialsService,
             final Repository<Block, FarmNode> nodeRepository,
             final SimulationService simulationService) {
-        super(logger, billOfMaterialsService, nodeRepository, NodeType.WORKABLE, simulationService);
+        super(logger, billOfMaterialsService, nodeRepository, NodeType.FARM, simulationService);
     }
 
     public boolean addWages(@NonNull final Block block, @NonNull final BillOfMaterials bill) {

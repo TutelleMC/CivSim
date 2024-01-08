@@ -7,7 +7,7 @@ import static org.mockito.Mockito.mock;
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
+import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import java.util.Objects;
 import java.util.logging.Logger;
 import lombok.NonNull;
@@ -30,9 +30,6 @@ class SimulationServiceTest extends BukkitTest {
 
     @NonNull
     private Node setupNode() {
-        return Objects.requireNonNull(new NodeBuilder()
-                .type(NodeType.WORKABLE)
-                .block(setupBarrelBlock())
-                .build());
+        return Objects.requireNonNull(NodeFactory.build(setupBarrelBlock(), NodeType.FARM));
     }
 }

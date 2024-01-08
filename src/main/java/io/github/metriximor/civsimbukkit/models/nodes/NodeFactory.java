@@ -4,41 +4,26 @@ import io.github.metriximor.civsimbukkit.models.NodeType;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.block.Block;
-import org.bukkit.block.TileState;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 @NoArgsConstructor
-public final class NodeBuilder {
-    private NodeType type;
-    private Block block;
-
-    @NonNull
-    public NodeBuilder block(@NonNull final Block block) {
-        if (!(block.getState() instanceof TileState)) {
-            return this;
-        }
-        this.block = block;
-        return this;
-    }
-
-    @NonNull
-    public NodeBuilder type(@NonNull final NodeType type) {
-        this.type = type;
-        return this;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T extends Node> T build() {
-        if (block == null || type == null) {
-            return null;
-        }
+public final class NodeFactory {
+    public static <T extends Node> T build(@NonNull final Block block, @NonNull final NodeType type) {
         final var existingType = Node.tryFindType(block);
         if (existingType != null && type != existingType) {
             return null;
         }
 
+        return tryBuild(block, type);
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    private static <T extends Node> T tryBuild(@NotNull Block block, @NotNull NodeType type) {
         try {
             switch (type) {
-                case WORKABLE -> {
+                case FARM -> {
                     return (T) new FarmNode(block, type);
                 }
                 case SHOP -> {
