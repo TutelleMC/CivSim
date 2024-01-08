@@ -3,7 +3,7 @@ package io.github.metriximor.civsimbukkit;
 import io.github.metriximor.civsimbukkit.commands.CivSimCommand;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
 import io.github.metriximor.civsimbukkit.listeners.NodeListener;
-import io.github.metriximor.civsimbukkit.models.nodes.WorkableNode;
+import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
@@ -30,7 +30,7 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         // Service Instantiation
         final BukkitScheduler scheduler = this.getServer().getScheduler();
         final BillOfMaterialsService billOfMaterialsService = new BillOfMaterialsService();
-        final Repository<Block, WorkableNode> workableNodeRepository = new InMemoryRepository<>();
+        final Repository<Block, FarmNode> workableNodeRepository = new InMemoryRepository<>();
         final SimulationService simulationService = new SimulationService(logger, this);
         final WorkableNodeService workableNodeService =
                 new WorkableNodeService(logger, billOfMaterialsService, workableNodeRepository, simulationService);

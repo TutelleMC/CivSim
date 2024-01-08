@@ -16,7 +16,7 @@ import org.bukkit.block.Container;
 import org.bukkit.block.TileState;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class Node {
+public abstract class Node implements NodeEssentials {
     private static final NamespacedKey ENABLED_KEY = getKey("enabled");
     private static final NamespacedKey TYPE_KEY = getKey("node_type");
     // private static final NamespacedKey INPUT_KEY = getKey("node_inputs");

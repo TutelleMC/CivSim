@@ -9,7 +9,7 @@ import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
-import io.github.metriximor.civsimbukkit.models.nodes.WorkableNode;
+import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
 import java.util.logging.Logger;
@@ -19,11 +19,11 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-class WorkableNodeServiceTest extends BukkitTest {
+class FarmNodeServiceTest extends BukkitTest {
     private final Logger logger = mock(Logger.class);
     private final BillOfMaterialsService billOfMaterialsService = mock(BillOfMaterialsService.class);
     private final SimulationService simulationService = mock(SimulationService.class);
-    private final InMemoryRepository<Block, WorkableNode> nodeRepository = spy(new InMemoryRepository<>());
+    private final InMemoryRepository<Block, FarmNode> nodeRepository = spy(new InMemoryRepository<>());
     private final WorkableNodeService workableNodeService =
             new WorkableNodeService(logger, billOfMaterialsService, nodeRepository, simulationService);
 

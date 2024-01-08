@@ -55,7 +55,6 @@ dependencies {
 
     // Commands
     implementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
-    testImplementation 'co.aikar:acf-paper:0.5.1-SNAPSHOT'
 
     // Testing
     testImplementation "org.mockito:mockito-core:3.+"

@@ -12,7 +12,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.Test;
 
-class WorkableNodeTest extends BukkitTest {
+class FarmNodeTest extends BukkitTest {
     @Test
     void testNodeConstructsSuccessfully() {
         final var block = setupBarrelBlock();
@@ -87,7 +87,7 @@ class WorkableNodeTest extends BukkitTest {
         assertFalse(node.getContainer().getInventory().isEmpty());
     }
 
-    private WorkableNode setupWorkableNode(@NonNull final Block block) {
+    private FarmNode setupWorkableNode(@NonNull final Block block) {
         return new NodeBuilder().type(NodeType.WORKABLE).block(block).build();
     }
 }

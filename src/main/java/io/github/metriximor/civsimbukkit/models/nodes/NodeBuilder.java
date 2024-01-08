@@ -39,7 +39,7 @@ public final class NodeBuilder {
         try {
             switch (type) {
                 case WORKABLE -> {
-                    return (T) new WorkableNode(block, type);
+                    return (T) new FarmNode(block, type);
                 }
                 case SHOP -> {
                     return (T) new ShopNode(block);
