@@ -1,6 +1,6 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
-import io.github.metriximor.civsimbukkit.gui.ToggleItem;
+import io.github.metriximor.civsimbukkit.gui.ToggleableButton;
 import io.github.metriximor.civsimbukkit.gui.WagesItem;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import lombok.NonNull;
@@ -23,10 +23,11 @@ public class FarmUIController {
         final boolean isEnabled = farmNodeService.isEnabled(block);
 
         final Gui gui = Gui.normal()
-                .setStructure("T W . . . . . . .")
-                .addIngredient('T', new ToggleItem(isEnabled, toggleCall -> farmNodeService.toggleNode(block)))
+                .setStructure("T W . . . . . B .")
+                .addIngredient('T', new ToggleableButton(isEnabled, toggleCall -> farmNodeService.toggleNode(block)))
                 .addIngredient(
                         'W', new WagesItem(farmNodeService.copyWages(block).orElse(null)))
+                //                .addIngredient('B', new ClickableButton(click -> ))
                 .build();
         Window.single()
                 .setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN))

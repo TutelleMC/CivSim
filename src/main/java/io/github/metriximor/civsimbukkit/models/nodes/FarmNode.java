@@ -9,7 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
-public class FarmNode extends Node implements Wages, PolygonalArea {
+public class FarmNode extends AbstractNode implements Wages, PolygonalArea {
     FarmNode(@NonNull final Block block, @NonNull final NodeType nodeType) {
         super(block, nodeType);
     }

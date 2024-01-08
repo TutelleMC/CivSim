@@ -6,7 +6,7 @@ import lombok.NonNull;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-public class ShopNode extends Node {
+public class ShopNode extends AbstractNode {
     ShopNode(@NonNull Block block) {
         super(block, NodeType.SHOP);
     }

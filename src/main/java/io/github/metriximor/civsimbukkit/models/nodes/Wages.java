@@ -9,7 +9,7 @@ import java.util.Optional;
 import lombok.NonNull;
 import org.bukkit.NamespacedKey;
 
-public interface Wages extends NodeEssentials {
+public interface Wages extends Node {
     NamespacedKey WAGES_KEY = getKey(BillOfMaterialsService.SetType.WAGES.toString());
 
     default boolean setWages(@NonNull final BillOfMaterials wageItems) {

@@ -47,24 +47,24 @@ class FarmNodeTest extends BukkitTest {
     @Test
     void testIsNodeReturnsFalseWhenItemIsNotANode() {
         final var block = setupBarrelBlock();
-        assertFalse(Node.isNode(block));
+        assertFalse(AbstractNode.isNode(block));
     }
 
     @Test
     void testIsNodeReturnsTrueWhenItIsANode() {
         final var block = setupBarrelBlock();
         setupWorkableNode(block);
-        assertTrue(Node.isNode(block));
+        assertTrue(AbstractNode.isNode(block));
     }
 
     @Test
     void testTryToFindTypeWorksCorrectly() {
         final var block = setupBarrelBlock();
 
-        assertNull(Node.tryFindType(block));
+        assertNull(AbstractNode.tryFindType(block));
 
         setupWorkableNode(block);
-        assertNotNull(Node.tryFindType(block));
+        assertNotNull(AbstractNode.tryFindType(block));
     }
 
     @Test

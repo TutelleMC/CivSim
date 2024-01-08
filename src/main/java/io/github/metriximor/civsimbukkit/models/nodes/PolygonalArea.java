@@ -10,12 +10,12 @@ import lombok.NonNull;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 
-public interface PolygonalArea extends NodeEssentials {
+public interface PolygonalArea extends Node {
     NamespacedKey AREA_MARKER = getKey("node_area");
     NamespacedKey AREA_KEY_X = getKey("node_area_x");
     NamespacedKey AREA_KEY_Y = getKey("node_area_y");
 
-    default boolean hasArea() {
+    default boolean hasAreaConfigured() {
         var state = getState();
         var pdc = state.getPersistentDataContainer();
         return pdc.has(AREA_MARKER);
@@ -41,7 +41,7 @@ public interface PolygonalArea extends NodeEssentials {
     default Polygon getArea() {
         var state = getState();
         var pdc = state.getPersistentDataContainer();
-        if (!hasArea()) {
+        if (!hasAreaConfigured()) {
             return null;
         }
         var x_points = pdc.get(AREA_KEY_Y, DataType.asList(PersistentDataType.INTEGER));
@@ -58,7 +58,7 @@ public interface PolygonalArea extends NodeEssentials {
     default boolean removeArea() {
         var state = getState();
         var pdc = state.getPersistentDataContainer();
-        if (!hasArea()) {
+        if (!hasAreaConfigured()) {
             return false;
         }
         pdc.remove(AREA_MARKER);

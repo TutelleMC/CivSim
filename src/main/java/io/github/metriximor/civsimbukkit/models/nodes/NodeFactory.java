@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
 @NoArgsConstructor
 public final class NodeFactory {
     public static <T extends Node> T build(@NonNull final Block block, @NonNull final NodeType type) {
-        final var existingType = Node.tryFindType(block);
+        final var existingType = AbstractNode.tryFindType(block);
         if (existingType != null && type != existingType) {
             return null;
         }

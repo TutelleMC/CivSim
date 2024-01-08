@@ -7,8 +7,8 @@ import static org.mockito.Mockito.*;
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
+import io.github.metriximor.civsimbukkit.models.nodes.AbstractNode;
 import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
-import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
@@ -30,7 +30,7 @@ class FarmNodeServiceTest extends BukkitTest {
     @Test
     void testNodeCreatesSuccessfully() {
         final Block barrel = setupBarrelBlock();
-        final Node node = NodeFactory.build(barrel, NodeType.FARM);
+        final AbstractNode node = NodeFactory.build(barrel, NodeType.FARM);
         assertNotNull(node);
     }
 
