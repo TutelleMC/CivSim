@@ -15,7 +15,7 @@ import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 @RequiredArgsConstructor
 public class ClickableButton extends AbstractItem {
-    record Click(
+    public record Click(
             @NonNull ClickType clickType, @NonNull Player player, @NonNull InventoryClickEvent inventoryClickEvent) {}
 
     private final Consumer<Click> action;

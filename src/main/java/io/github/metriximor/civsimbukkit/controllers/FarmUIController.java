@@ -1,5 +1,6 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
+import io.github.metriximor.civsimbukkit.gui.ClickableButton;
 import io.github.metriximor.civsimbukkit.gui.ToggleableButton;
 import io.github.metriximor.civsimbukkit.gui.WagesItem;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
@@ -27,7 +28,8 @@ public class FarmUIController {
                 .addIngredient('T', new ToggleableButton(isEnabled, toggleCall -> farmNodeService.toggleNode(block)))
                 .addIngredient(
                         'W', new WagesItem(farmNodeService.copyWages(block).orElse(null)))
-                //                .addIngredient('B', new ClickableButton(click -> ))
+                .addIngredient(
+                        'B', new ClickableButton(click -> farmNodeService.defineBoundaries(click.player(), block)))
                 .build();
         Window.single()
                 .setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN))
