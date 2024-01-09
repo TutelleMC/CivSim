@@ -1,9 +1,9 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
+import io.github.metriximor.civsimbukkit.models.AbstractNode;
+import io.github.metriximor.civsimbukkit.models.NodeFactory;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.nodes.AbstractNode;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;

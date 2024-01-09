@@ -1,6 +1,7 @@
 package io.github.metriximor.civsimbukkit.commands;
 
 import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
 import co.aikar.commands.BaseCommand;
@@ -24,7 +25,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("civsim|csim|cim")
 @RequiredArgsConstructor
@@ -105,13 +105,5 @@ public class CivSimCommand extends BaseCommand {
     @HelpCommand
     public static void onHelp(final CommandSender sender, final CommandHelp help) {
         help.showHelp();
-    }
-
-    private static void giveItemToPlayer(@NotNull final Player player, final ItemStack farmItem) {
-        // Add item to player
-        final var droppedItem = player.getInventory().addItem(farmItem);
-        if (!droppedItem.isEmpty()) { // drop around the player if he can't fit it in inv
-            droppedItem.forEach((idx, item) -> player.getWorld().dropItem(player.getLocation(), item));
-        }
     }
 }

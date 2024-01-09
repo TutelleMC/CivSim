@@ -1,6 +1,6 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
-import io.github.metriximor.civsimbukkit.models.NodeType;
+import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.bukkit.block.Block;

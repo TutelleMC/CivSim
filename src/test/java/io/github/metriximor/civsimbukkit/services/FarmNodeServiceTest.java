@@ -5,11 +5,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
+import io.github.metriximor.civsimbukkit.models.AbstractNode;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
+import io.github.metriximor.civsimbukkit.models.FarmNode;
+import io.github.metriximor.civsimbukkit.models.NodeFactory;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.nodes.AbstractNode;
-import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;

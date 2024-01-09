@@ -1,10 +1,8 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
-import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
-import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import lombok.NonNull;
 import org.bukkit.Material;

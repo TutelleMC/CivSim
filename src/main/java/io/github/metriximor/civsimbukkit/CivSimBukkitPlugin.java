@@ -3,7 +3,7 @@ package io.github.metriximor.civsimbukkit;
 import io.github.metriximor.civsimbukkit.commands.CivSimCommand;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
 import io.github.metriximor.civsimbukkit.listeners.NodeListener;
-import io.github.metriximor.civsimbukkit.models.nodes.FarmNode;
+import io.github.metriximor.civsimbukkit.models.FarmNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;

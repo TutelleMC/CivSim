@@ -1,7 +1,7 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
-import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.Transaction;
+import io.github.metriximor.civsimbukkit.models.nodes.PolygonalArea;
+import io.github.metriximor.civsimbukkit.models.nodes.Wages;
 import java.util.List;
 import lombok.NonNull;
 import org.bukkit.Material;

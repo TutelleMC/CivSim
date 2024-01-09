@@ -1,7 +1,5 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
-import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.Transaction;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;

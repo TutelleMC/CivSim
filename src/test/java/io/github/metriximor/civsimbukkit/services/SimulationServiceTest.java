@@ -5,9 +5,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
+import io.github.metriximor.civsimbukkit.models.AbstractNode;
+import io.github.metriximor.civsimbukkit.models.NodeFactory;
 import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.nodes.AbstractNode;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeFactory;
 import java.util.Objects;
 import java.util.logging.Logger;
 import lombok.NonNull;

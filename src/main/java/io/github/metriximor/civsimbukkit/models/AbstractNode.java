@@ -1,11 +1,10 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
 import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getKey;
 import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getMarkerKey;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
-import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.Transaction;
+import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.utils.UUIDUtils;
 import java.util.Optional;
 import java.util.UUID;
