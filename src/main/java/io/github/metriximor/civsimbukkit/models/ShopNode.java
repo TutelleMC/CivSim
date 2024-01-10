@@ -5,8 +5,10 @@ import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
 public class ShopNode extends AbstractNode {
+    private static final NodeType TYPE = NodeType.SHOP;
+
     ShopNode(@NonNull Block block) {
-        super(block, NodeType.SHOP);
+        super(block, TYPE);
     }
 
     @Override
@@ -17,5 +19,12 @@ public class ShopNode extends AbstractNode {
     @Override
     public boolean perform() {
         throw new UnsupportedOperationException("TODO");
+    }
+
+    public static ShopNode build(@NonNull final Block block) {
+        if (!isOfType(block, TYPE)) {
+            return null;
+        }
+        return new ShopNode(block);
     }
 }

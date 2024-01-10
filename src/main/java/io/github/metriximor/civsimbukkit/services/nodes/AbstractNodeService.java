@@ -1,8 +1,6 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
 import io.github.metriximor.civsimbukkit.models.AbstractNode;
-import io.github.metriximor.civsimbukkit.models.NodeFactory;
-import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
@@ -29,12 +27,13 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
     private final BillOfMaterialsService billOfMaterialsService;
 
     private final Repository<Block, T> nodeRepository;
-    private final NodeType serviceNodeType;
     private final SimulationService simulationService;
 
     public boolean blockIsNotNode(final Block block) {
         return !AbstractNode.isNode(block);
     }
+
+    public abstract T build(@NonNull final Block block);
 
     @Nullable
     public T getNode(@NonNull final Block block) {
@@ -42,7 +41,7 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         if (result != null) {
             return result;
         }
-        final T node = NodeFactory.build(block, serviceNodeType);
+        final T node = build(block);
         if (node == null) {
             return null;
         }
@@ -51,7 +50,7 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
     }
 
     public Optional<T> registerNode(@NonNull final Block block) {
-        final T result = NodeFactory.build(block, NodeType.FARM);
+        final T result = build(block);
         if (result == null) {
             return Optional.empty();
         }

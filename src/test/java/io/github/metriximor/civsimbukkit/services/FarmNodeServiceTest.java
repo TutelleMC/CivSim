@@ -1,15 +1,12 @@
 package io.github.metriximor.civsimbukkit.services;
 
+import static io.github.metriximor.civsimbukkit.models.AbstractNode.isOfType;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
-import io.github.metriximor.civsimbukkit.models.AbstractNode;
-import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
-import io.github.metriximor.civsimbukkit.models.FarmNode;
-import io.github.metriximor.civsimbukkit.models.NodeFactory;
-import io.github.metriximor.civsimbukkit.models.NodeType;
+import io.github.metriximor.civsimbukkit.models.*;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
@@ -30,7 +27,7 @@ class FarmNodeServiceTest extends BukkitTest {
     @Test
     void testNodeCreatesSuccessfully() {
         final Block barrel = setupBarrelBlock();
-        final AbstractNode node = NodeFactory.build(barrel, NodeType.FARM);
+        final FarmNode node = FarmNode.build(barrel);
         assertNotNull(node);
     }
 
@@ -74,7 +71,8 @@ class FarmNodeServiceTest extends BukkitTest {
     @Test
     void testGetNodeReturnsNullWhenMismatchedTypesAreGotten() {
         final Block barrel = setupBarrelBlock();
-        NodeFactory.build(barrel, NodeType.SHOP);
+        ShopNode.build(barrel);
+        assertFalse(isOfType(barrel, NodeType.FARM));
         assertNull(farmNodeService.getNode(barrel));
     }
 

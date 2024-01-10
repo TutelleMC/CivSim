@@ -10,8 +10,10 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class FarmNode extends AbstractNode implements Wages, PolygonalArea {
-    FarmNode(@NonNull final Block block, @NonNull final NodeType nodeType) {
-        super(block, nodeType);
+    private static final NodeType TYPE = NodeType.FARM;
+
+    FarmNode(@NonNull final Block block) {
+        super(block, TYPE);
     }
 
     @Override
@@ -23,5 +25,12 @@ public class FarmNode extends AbstractNode implements Wages, PolygonalArea {
     public boolean perform() {
         var container = getContainer();
         return container.getInventory().addItem(new ItemStack(Material.WHEAT)).isEmpty();
+    }
+
+    public static FarmNode build(@NonNull final Block block) {
+        if (!isOfType(block, TYPE)) {
+            return null;
+        }
+        return new FarmNode(block);
     }
 }

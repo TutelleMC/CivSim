@@ -14,13 +14,13 @@ class FarmNodeTest extends BukkitTest {
     @Test
     void testNodeConstructsSuccessfully() {
         final var block = setupBarrelBlock();
-        assertNotNull(NodeFactory.build(block, NodeType.FARM));
+        assertNotNull(FarmNode.build(block));
     }
 
     @Test
     void testWagesWorksCorrectly() {
         final var block = setupBarrelBlock();
-        final var node = setupWorkableNode(block);
+        final var node = setupFarmNode(block);
         final var wages = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);
         wages.add(new ItemStack(Material.IRON_INGOT));
 
@@ -51,7 +51,7 @@ class FarmNodeTest extends BukkitTest {
     @Test
     void testIsNodeReturnsTrueWhenItIsANode() {
         final var block = setupBarrelBlock();
-        setupWorkableNode(block);
+        setupFarmNode(block);
         assertTrue(AbstractNode.isNode(block));
     }
 
@@ -61,13 +61,13 @@ class FarmNodeTest extends BukkitTest {
 
         assertNull(AbstractNode.tryFindType(block));
 
-        setupWorkableNode(block);
+        setupFarmNode(block);
         assertNotNull(AbstractNode.tryFindType(block));
     }
 
     @Test
     void testToggleWorksCorrectly() {
-        final var node = setupWorkableNode(setupBarrelBlock());
+        final var node = setupFarmNode(setupBarrelBlock());
 
         assertFalse(node.isEnabled());
         assertTrue(node.toggle());
@@ -78,14 +78,14 @@ class FarmNodeTest extends BukkitTest {
 
     @Test
     void testPerformUpdatesInventoryCorrectly() {
-        final var node = setupWorkableNode(setupBarrelBlock());
+        final var node = setupFarmNode(setupBarrelBlock());
 
         assertTrue(node.getContainer().getInventory().isEmpty());
         assertTrue(node.perform(5));
         assertFalse(node.getContainer().getInventory().isEmpty());
     }
 
-    private FarmNode setupWorkableNode(@NonNull final Block block) {
-        return NodeFactory.build(block, NodeType.FARM);
+    private FarmNode setupFarmNode(@NonNull final Block block) {
+        return FarmNode.build(block);
     }
 }

@@ -1,5 +1,8 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
+
 import io.github.metriximor.civsimbukkit.gui.ClickableButton;
 import io.github.metriximor.civsimbukkit.gui.ToggleableButton;
 import io.github.metriximor.civsimbukkit.gui.WagesItem;
@@ -9,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.Gui;
 import xyz.xenondevs.invui.window.Window;
 
@@ -28,13 +32,21 @@ public class FarmUIController {
                 .addIngredient('T', new ToggleableButton(isEnabled, toggleCall -> farmNodeService.toggleNode(block)))
                 .addIngredient(
                         'W', new WagesItem(farmNodeService.copyWages(block).orElse(null)))
-                .addIngredient(
-                        'B', new ClickableButton(click -> farmNodeService.defineBoundaries(click.player(), block)))
+                .addIngredient('B', new ClickableButton(click -> defineBoundary(player, block)))
                 .build();
         Window.single()
                 .setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN))
                 .setGui(gui)
                 .build(player)
                 .open();
+    }
+
+    private void defineBoundary(@NotNull Player player, @NotNull Block block) {
+        var boundaryMarker = farmNodeService.defineBoundaries(player, block);
+        if (boundaryMarker.isEmpty()) {
+            player.sendMessage(getFailMessage("Failed to create boundary marker!"));
+            return;
+        }
+        giveItemToPlayer(player, boundaryMarker.get());
     }
 }

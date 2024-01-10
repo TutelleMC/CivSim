@@ -43,12 +43,24 @@ public abstract class AbstractNode implements Node {
         return pdc.has(getMarkerKey());
     }
 
+    public static boolean isTileState(@NonNull final Block block) {
+        return block.getState() instanceof TileState;
+    }
+
     public static NodeType tryFindType(final Block block) {
         if (!isNode(block)) {
             return null;
         }
         final var state = (TileState) block.getState();
         return state.getPersistentDataContainer().get(TYPE_KEY, DataType.asEnum(NodeType.class));
+    }
+
+    public static boolean isOfType(@NonNull final Block block, @NonNull final NodeType nodeType) {
+        if (!isTileState(block)) {
+            return false;
+        }
+        var existingType = tryFindType(block);
+        return existingType == null || existingType.equals(nodeType);
     }
 
     @NonNull
