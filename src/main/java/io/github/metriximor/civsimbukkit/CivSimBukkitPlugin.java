@@ -2,6 +2,7 @@ package io.github.metriximor.civsimbukkit;
 
 import io.github.metriximor.civsimbukkit.commands.CivSimCommand;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
+import io.github.metriximor.civsimbukkit.listeners.BoundaryListener;
 import io.github.metriximor.civsimbukkit.listeners.NodeListener;
 import io.github.metriximor.civsimbukkit.models.FarmNode;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
@@ -41,6 +42,7 @@ public class CivSimBukkitPlugin extends JavaPlugin {
 
         // Register Events
         pluginManager.registerEvents(new NodeListener(farmNodeService, billOfMaterialsService, farmUiController), this);
+        pluginManager.registerEvents(new BoundaryListener(logger, this, farmNodeService), this);
 
         logger.info("CivSimBukkit Plugin loaded successfully");
     }

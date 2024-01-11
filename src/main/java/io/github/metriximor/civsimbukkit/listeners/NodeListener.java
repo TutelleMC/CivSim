@@ -3,13 +3,16 @@ package io.github.metriximor.civsimbukkit.listeners;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
 
+import com.destroystokyo.paper.ParticleBuilder;
 import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import io.github.metriximor.civsimbukkit.controllers.FarmUIController;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
@@ -18,8 +21,13 @@ import org.jetbrains.annotations.NotNull;
 
 @RequiredArgsConstructor
 public class NodeListener implements Listener {
+    @NonNull
     private final FarmNodeService farmNodeService;
+
+    @NonNull
     private final BillOfMaterialsService billOfMaterialsService;
+
+    @NonNull
     private final FarmUIController farmUiController;
 
     @EventHandler(ignoreCancelled = true)

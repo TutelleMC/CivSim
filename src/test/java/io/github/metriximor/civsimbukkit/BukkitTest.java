@@ -4,6 +4,7 @@ import be.seeseemelk.mockbukkit.Coordinate;
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
 import be.seeseemelk.mockbukkit.WorldMock;
+import be.seeseemelk.mockbukkit.entity.PlayerMock;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
@@ -31,6 +32,11 @@ public class BukkitTest {
         final Block barrel = world.createBlock(new Coordinate(0, 0, 0));
         barrel.setType(Material.BARREL);
         return barrel;
+    }
+
+    @NotNull
+    protected PlayerMock setupPlayer() {
+        return server.addPlayer();
     }
 
     protected void tick(long amountOfTicks) {
