@@ -21,13 +21,14 @@
  */
 package io.github.metriximor.civsimbukkit.utils;
 
-import lombok.NonNull;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.*;
+import java.util.Iterator;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import lombok.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A result type that contains either an value or an error.
@@ -261,8 +262,7 @@ public class Result<T, E> implements Iterable<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Result<?, ?> result = (Result<?, ?>) o;
-        return Objects.equals(ok, result.ok) &&
-                Objects.equals(err, result.err);
+        return Objects.equals(ok, result.ok) && Objects.equals(err, result.err);
     }
 
     @Override
@@ -275,5 +275,3 @@ public class Result<T, E> implements Iterable<T> {
         return ok == null ? "Err(" + err + ")" : "Ok(" + ok + ")";
     }
 }
-
-
