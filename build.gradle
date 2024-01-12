@@ -4,7 +4,6 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '7.1.2'
     id "org.ajoberstar.reckon" version "0.18.1"
     id "com.diffplug.spotless" version "6.23.3"
-    id "io.papermc.paperweight.userdev" version "1.5.11"
 }
 
 group 'io.github.metriximor'
@@ -46,7 +45,6 @@ repositories {
 dependencies {
     // Minecraft
     //noinspection VulnerableLibrariesLocal
-    paperweight.paperDevBundle("1.18.2-R0.1-SNAPSHOT")
     compileOnly(testImplementation("io.papermc.paper:paper-api:1.18.2-R0.1-SNAPSHOT"))
 
     implementation 'com.jeff_media:MorePersistentDataTypes:2.4.0'
@@ -105,7 +103,7 @@ spotless {
         indentWithSpaces()
     }
 }
-build.dependsOn spotlessApply, shadowJar
+build.dependsOn spotlessApply
 
 compileJava {
     options.compilerArgs += ["-parameters"]
