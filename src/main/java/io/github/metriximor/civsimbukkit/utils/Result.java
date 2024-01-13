@@ -234,6 +234,13 @@ public class Result<T, E> implements Iterable<T> {
         return new Result<>(null, err);
     }
 
+    public static <T, E> Result<T, E> ofNullable(final T value, @NonNull final E err) {
+        if (value == null) {
+            return err(err);
+        }
+        return ok(value);
+    }
+
     public Stream<T> stream() {
         return StreamSupport.stream(this.spliterator(), false);
     }

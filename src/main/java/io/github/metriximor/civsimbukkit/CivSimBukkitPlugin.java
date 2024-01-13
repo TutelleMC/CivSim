@@ -9,6 +9,7 @@ import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.CommandsService;
+import io.github.metriximor.civsimbukkit.services.ParticleService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.List;
@@ -33,8 +34,9 @@ public class CivSimBukkitPlugin extends JavaPlugin {
         final BillOfMaterialsService billOfMaterialsService = new BillOfMaterialsService();
         final Repository<Block, FarmNode> workableNodeRepository = new InMemoryRepository<>();
         final SimulationService simulationService = new SimulationService(logger, this);
-        final FarmNodeService farmNodeService =
-                new FarmNodeService(logger, billOfMaterialsService, workableNodeRepository, simulationService);
+        final ParticleService particleService = new ParticleService(this);
+        final FarmNodeService farmNodeService = new FarmNodeService(
+                logger, billOfMaterialsService, workableNodeRepository, simulationService, particleService);
 
         final CommandsService commandsService =
                 new CommandsService(this, List.of(new CivSimCommand(logger, farmNodeService, billOfMaterialsService)));

@@ -21,8 +21,9 @@ class FarmNodeServiceTest extends BukkitTest {
     private final BillOfMaterialsService billOfMaterialsService = mock(BillOfMaterialsService.class);
     private final SimulationService simulationService = mock(SimulationService.class);
     private final InMemoryRepository<Block, FarmNode> nodeRepository = spy(new InMemoryRepository<>());
+    private final ParticleService particleService = mock(ParticleService.class);
     private final FarmNodeService farmNodeService =
-            new FarmNodeService(logger, billOfMaterialsService, nodeRepository, simulationService);
+            new FarmNodeService(logger, billOfMaterialsService, nodeRepository, simulationService, particleService);
 
     @Test
     void testNodeCreatesSuccessfully() {

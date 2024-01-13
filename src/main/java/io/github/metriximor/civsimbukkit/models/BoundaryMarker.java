@@ -1,10 +1,9 @@
-package io.github.metriximor.civsimbukkit.services;
+package io.github.metriximor.civsimbukkit.models;
 
 import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getKey;
 import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getMarkerKey;
 
 import com.jeff_media.morepersistentdatatypes.DataType;
-import java.awt.*;
 import java.util.Optional;
 import lombok.NonNull;
 import net.kyori.adventure.text.Component;
@@ -18,16 +17,21 @@ public class BoundaryMarker {
     private static final NamespacedKey INDEX_KEY = getKey("boundary_index");
 
     private final int index;
-    private Location location;
-    private boolean placed = false;
 
     public BoundaryMarker(final int index) {
         this.index = index;
     }
 
     public static boolean isBoundaryMarker(@NonNull final ItemStack boundaryMarker) {
-        return boundaryMarker.getItemMeta().getPersistentDataContainer().has(getMarkerKey())
-                && boundaryMarker.getItemMeta().getPersistentDataContainer().has(INDEX_KEY);
+        if (boundaryMarker.getType() != Material.ARMOR_STAND) {
+            return false;
+        }
+        final var meta = boundaryMarker.getItemMeta();
+        if (meta == null) {
+            return false;
+        }
+        return meta.getPersistentDataContainer().has(getMarkerKey())
+                && meta.getPersistentDataContainer().has(INDEX_KEY);
     }
 
     public static Optional<Integer> getIndexFromItemStack(@NonNull final ItemStack boundaryMarker) {
@@ -38,10 +42,8 @@ public class BoundaryMarker {
                 boundaryMarker.getItemMeta().getPersistentDataContainer().get(INDEX_KEY, DataType.INTEGER));
     }
 
-    public boolean place(@NonNull final Location location) {
-        this.location = location;
-        this.placed = true;
-        return placed;
+    public PlacedBoundaryMarker place(@NonNull final Location location) {
+        return new PlacedBoundaryMarker(location);
     }
 
     public ItemStack getAsArmorStand() {
@@ -51,14 +53,5 @@ public class BoundaryMarker {
         armorStand.editMeta(meta -> meta.getPersistentDataContainer().set(getMarkerKey(), DataType.BYTE, (byte) 0));
         armorStand.editMeta(meta -> meta.getPersistentDataContainer().set(INDEX_KEY, DataType.INTEGER, index));
         return armorStand;
-    }
-
-    public double distanceToSquared(@NonNull final Location location) {
-        return this.location.distance(location);
-    }
-
-    @NonNull
-    public Point asPoint2d() {
-        return new Point(location.getBlockX(), location.getBlockZ());
     }
 }

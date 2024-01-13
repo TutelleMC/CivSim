@@ -1,10 +1,9 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
-import static io.github.metriximor.civsimbukkit.services.BoundaryMarker.isBoundaryMarker;
+import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.isBoundaryMarker;
 import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
-import io.github.metriximor.civsimbukkit.services.BoundaryMarker;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
 import lombok.NonNull;
@@ -49,22 +48,29 @@ public class BoundaryListener implements Listener {
         }
         final var itemStack = mainHandIsBoundaryMarker ? mainHand : offHand;
 
-        player.sendMessage("You are holding %s".formatted(itemStack));
-        player.sendMessage(
-                "It's a boundary marker! Index: %s".formatted(BoundaryMarker.getIndexFromItemStack(itemStack)));
-
         // When updating to 1.20, we can update this to hide for everyone. As it stands it's going to be wack
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> onlinePlayer.hideEntity(plugin, event.getEntity()));
         player.showEntity(plugin, event.getEntity());
 
         final var nextMarker =
-                farmNodeService.addBoundary(player, itemStack, event.getBlock().getLocation());
-        if (nextMarker.isEmpty()) {
-            player.sendMessage(getFailMessage("Failed to place marker!"));
+                farmNodeService.addBoundary(player, itemStack, event.getEntity().getLocation());
+        if (nextMarker.isErr()) {
+            final String errorMessage =
+                    switch (nextMarker.unwrapErr()) {
+                        case CONTACT_ADMIN -> "Error, if you see this message contact an admin";
+                        case NOT_A_BOUNDARY_MARKER -> "Placed armor stand is not a boundary";
+                        case NO_INDEX -> "Boundary Marker has no index, please contact an admin";
+                        case NOT_IN_BOUNDARY_EDITING_MODE -> "You are not in boundary editing mode";
+                        case DISTANCE_TOO_BIG -> "Distance between boundary markers too big";
+                        case AREA_TOO_BIG -> "The area of the farm boundary is too big";
+                        case TOO_MANY_BOUNDARY_MARKERS -> "You have hit the limit in number of boundary markers";
+                    };
+            player.sendMessage(getFailMessage(errorMessage));
             event.setCancelled(true);
             return;
         }
 
-        giveItemToPlayer(player, nextMarker.get());
+        // TODO replace the current boundary marker, not add to next slot
+        giveItemToPlayer(player, nextMarker.unwrap());
     }
 }
