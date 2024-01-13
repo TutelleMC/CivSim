@@ -48,8 +48,8 @@ public class BoundaryMarker {
 
     public ItemStack getAsArmorStand() {
         var armorStand = new ItemStack(Material.ARMOR_STAND);
-        armorStand.editMeta(
-                meta -> meta.displayName(Component.text("Boundary Marker").color(NamedTextColor.DARK_PURPLE)));
+        armorStand.editMeta(meta -> meta.displayName(
+                Component.text("Boundary Marker #%s".formatted(index)).color(NamedTextColor.DARK_PURPLE)));
         armorStand.editMeta(meta -> meta.getPersistentDataContainer().set(getMarkerKey(), DataType.BYTE, (byte) 0));
         armorStand.editMeta(meta -> meta.getPersistentDataContainer().set(INDEX_KEY, DataType.INTEGER, index));
         return armorStand;
