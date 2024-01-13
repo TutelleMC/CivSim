@@ -101,7 +101,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             previousLocation.add(0, 0.5, 0);
             particleCurrentLocation.add(0, 0.5, 0);
             getParticleService()
-                    .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.ORANGE, player);
+                    .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.PURPLE, player);
         }
         if (index >= 3) {
             final var points = new ArrayList<>(
