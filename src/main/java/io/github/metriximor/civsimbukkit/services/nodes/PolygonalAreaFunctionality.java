@@ -50,8 +50,14 @@ import org.bukkit.inventory.ItemStack;
 
 public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends NodeService<T> {
     String DEFINING_BOUNDARIES_MSG =
-            "Place down the boundary marker to start! Type %s/civsim boundary done%s when finished"
-                    .formatted(ChatColor.ITALIC, ChatColor.RESET);
+            "Place down the boundary marker to start! Type %s/civsim boundary done%s%s when finished or %s/civsim boundary cancel%s%s to cancel"
+                    .formatted(
+                            ChatColor.ITALIC,
+                            ChatColor.RESET,
+                            ChatColor.GREEN,
+                            ChatColor.ITALIC,
+                            ChatColor.RESET,
+                            ChatColor.GREEN);
     double MAX_DISTANCE_BETWEEN_MARKERS = 50d; // TODO load as configurable
     double MAX_DISTANCE_BETWEEN_MARKERS_SQUARED = MAX_DISTANCE_BETWEEN_MARKERS * MAX_DISTANCE_BETWEEN_MARKERS;
     double MAX_AREA_POLYGON = 2500d; // TODO load as configurable through function or smth
@@ -104,9 +110,10 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
                     .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.PURPLE, player);
         }
         if (index >= 3) {
+            final var currentPoint = new Point(location.getBlockX(), location.getBlockZ());
             final var points = new ArrayList<>(
                     pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());
-            points.add(new Point(location.getBlockX(), location.getBlockZ()));
+            points.add(currentPoint);
             final var polygon = Polygon.build(points);
             if (polygon == null) {
                 getLogger().severe("Player %s placed 3 points but the polygon failed to build");
@@ -115,6 +122,9 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             var area = polygon.area();
             if (area > MAX_AREA_POLYGON) {
                 return err(AddBoundaryError.AREA_TOO_BIG);
+            }
+            if (polygon.edgeIsSelfIntersecting(pair.right().get(pair.right().size() - 1).asPoint2d(), currentPoint)) {
+                return err(AddBoundaryError.SELF_INTERSECTING);
             }
         }
         if (index >= MAX_POLYGON_POINTS) {

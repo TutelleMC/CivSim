@@ -64,6 +64,7 @@ public class BoundaryListener implements Listener {
                         case DISTANCE_TOO_BIG -> "Distance between boundary markers too big";
                         case AREA_TOO_BIG -> "The area of the farm boundary is too big";
                         case TOO_MANY_BOUNDARY_MARKERS -> "You have hit the limit in number of boundary markers";
+                        case SELF_INTERSECTING -> "You can't place a marker that is intersecting existing markers";
                     };
             player.sendMessage(getFailMessage(errorMessage));
             event.setCancelled(true);
