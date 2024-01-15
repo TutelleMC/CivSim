@@ -22,14 +22,13 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.getIndexFromItemStack;
-import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.isBoundaryMarker;
 import static io.github.metriximor.civsimbukkit.utils.Result.err;
 import static io.github.metriximor.civsimbukkit.utils.Result.ok;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
 
 import io.github.metriximor.civsimbukkit.models.BoundaryMarker;
 import io.github.metriximor.civsimbukkit.models.PlacedBoundaryMarker;
-import io.github.metriximor.civsimbukkit.models.errors.AddBoundaryError;
+import io.github.metriximor.civsimbukkit.models.errors.PlaceBoundaryError;
 import io.github.metriximor.civsimbukkit.models.nodes.PolygonalArea;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.ParticleService;
@@ -68,8 +67,8 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
 
     ParticleService getParticleService();
 
-    default Optional<ItemStack> defineBoundaries(@NonNull final Player player, @NonNull final Block block) {
-        final PolygonalArea node = getNode(block);
+    default Optional<ItemStack> defineBoundaries(@NonNull final Player player, @NonNull final Block nodeBlock) {
+        final PolygonalArea node = getNode(nodeBlock);
         if (node == null) {
             return Optional.empty();
         }
@@ -79,28 +78,25 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         return Optional.of(boundaryMarker.getAsArmorStand());
     }
 
-    default Result<ItemStack, AddBoundaryError> addBoundary(
+    default Result<ItemStack, PlaceBoundaryError> placeBoundary(
             @NonNull final Player player,
             @NonNull final ItemStack currentBoundaryItemStack,
             @NonNull final Location location) {
-        if (!isBoundaryMarker(currentBoundaryItemStack)) {
-            return err(AddBoundaryError.NOT_A_BOUNDARY_MARKER);
-        }
         final Integer index = getIndexFromItemStack(currentBoundaryItemStack).orElse(null);
         if (index == null) {
-            return err(AddBoundaryError.NO_INDEX);
+            return err(PlaceBoundaryError.NOT_A_BOUNDARY_MARKER);
         }
         final var pair = getPolygonalAreasRepo().getById(player);
         if (pair == null) {
             getLogger()
                     .severe("Player %s is not in boundaries editing mode but managed to place one at %s"
                             .formatted(player, location));
-            return err(AddBoundaryError.NOT_IN_BOUNDARY_EDITING_MODE);
+            return err(PlaceBoundaryError.NOT_IN_BOUNDARY_EDITING_MODE);
         }
         if (index > 0) {
             final var previousBoundary = pair.right().get(index - 1);
             if (previousBoundary.distanceToSquared(location) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {
-                return err(AddBoundaryError.DISTANCE_TOO_BIG);
+                return err(PlaceBoundaryError.DISTANCE_TOO_BIG);
             }
             final var previousLocation = previousBoundary.getLocation().clone();
             final var particleCurrentLocation = location.clone();
@@ -118,19 +114,19 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             final var polygon = Polygon.build(points);
             if (polygon == null) {
                 getLogger().severe("Player %s placed 3 points but the polygon failed to build");
-                return err(AddBoundaryError.CONTACT_ADMIN);
+                return err(PlaceBoundaryError.CONTACT_ADMIN);
             }
             var area = polygon.area();
             if (area > MAX_AREA_POLYGON) {
-                return err(AddBoundaryError.AREA_TOO_BIG);
+                return err(PlaceBoundaryError.AREA_TOO_BIG);
             }
             if (polygon.edgeIsSelfIntersecting(
                     pair.right().get(pair.right().size() - 1).asPoint2d(), currentPoint)) {
-                return err(AddBoundaryError.SELF_INTERSECTING);
+                return err(PlaceBoundaryError.SELF_INTERSECTING);
             }
         }
         if (index >= MAX_POLYGON_POINTS) {
-            return err(AddBoundaryError.TOO_MANY_BOUNDARY_MARKERS);
+            return err(PlaceBoundaryError.TOO_MANY_BOUNDARY_MARKERS);
         }
         pair.right().add(new BoundaryMarker(index).placeAt(location));
         final var boundaryMarker = new BoundaryMarker(index + 1);

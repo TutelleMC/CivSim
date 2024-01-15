@@ -53,14 +53,13 @@ public class BoundaryListener implements Listener {
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> onlinePlayer.hideEntity(plugin, event.getEntity()));
         player.showEntity(plugin, event.getEntity());
 
-        final var nextMarker =
-                farmNodeService.addBoundary(player, itemStack, event.getEntity().getLocation());
+        final var nextMarker = farmNodeService.placeBoundary(
+                player, itemStack, event.getEntity().getLocation());
         if (nextMarker.isErr()) {
             final String errorMessage =
                     switch (nextMarker.unwrapErr()) {
                         case CONTACT_ADMIN -> "Error, if you see this message please contact an admin";
                         case NOT_A_BOUNDARY_MARKER -> "Placed armor stand is not a boundary";
-                        case NO_INDEX -> "Boundary Marker has no index, please contact an admin";
                         case NOT_IN_BOUNDARY_EDITING_MODE -> "You are not in boundary editing mode";
                         case DISTANCE_TOO_BIG -> "Distance between boundary markers too big";
                         case AREA_TOO_BIG -> "The area of the farm boundary is too big";

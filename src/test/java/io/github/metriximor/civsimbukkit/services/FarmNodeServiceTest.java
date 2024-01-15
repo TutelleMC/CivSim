@@ -1,15 +1,18 @@
 package io.github.metriximor.civsimbukkit.services;
 
 import static io.github.metriximor.civsimbukkit.models.AbstractNode.isOfType;
+import static io.github.metriximor.civsimbukkit.services.nodes.PolygonalAreaFunctionality.MAX_DISTANCE_BETWEEN_MARKERS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.models.*;
+import io.github.metriximor.civsimbukkit.models.errors.PlaceBoundaryError;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
@@ -123,7 +126,83 @@ class FarmNodeServiceTest extends BukkitTest {
         final var block = setupBarrelBlock();
         final var player = setupPlayer();
         farmNodeService.registerNode(block);
+
         assertTrue(farmNodeService.defineBoundaries(player, block).isPresent());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenItemIsNotABoundaryMarker() {
+        final var player = setupPlayer();
+        final var location = new Location(getWorld(), 1, 1, 1);
+
+        assertEquals(
+                PlaceBoundaryError.NOT_A_BOUNDARY_MARKER,
+                farmNodeService
+                        .placeBoundary(player, new ItemStack(Material.ARMOR_STAND), location)
+                        .unwrapErr());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenPlayerIsNotInBoundaryEditingMode() {
+        final var player = setupPlayer();
+        final var boundary = new BoundaryMarker(0).getAsArmorStand();
+
+        assertEquals(
+                PlaceBoundaryError.NOT_IN_BOUNDARY_EDITING_MODE,
+                farmNodeService
+                        .placeBoundary(player, boundary, new Location(getWorld(), 1, 1, 1))
+                        .unwrapErr());
+    }
+
+    @Test
+    void testPlaceBoundariesAddsTheFirstBoundarySuccessfully() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var boundaryArmorStand =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+
+        final var result = farmNodeService.placeBoundary(player, boundaryArmorStand, new Location(getWorld(), 0, 0, 0));
+
+        assertTrue(result.isOk());
+        assertNotEquals(boundaryArmorStand, result.unwrap());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenBoundariesAreTooFarApart() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var firstBoundary =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var secondBoundary = farmNodeService
+                .placeBoundary(player, firstBoundary, new Location(getWorld(), 0, 0, 0))
+                .unwrap();
+
+        final var result = farmNodeService.placeBoundary(
+                player, secondBoundary, new Location(getWorld(), MAX_DISTANCE_BETWEEN_MARKERS + 1, 0, 0));
+
+        assertTrue(result.isErr());
+        assertEquals(PlaceBoundaryError.DISTANCE_TOO_BIG, result.unwrapErr());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenBoundariesAreAtTheExactLimit() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var firstBoundary =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var secondBoundary = farmNodeService
+                .placeBoundary(player, firstBoundary, new Location(getWorld(), 0, 0, 0))
+                .unwrap();
+
+        final var result = farmNodeService.placeBoundary(
+                player, secondBoundary, new Location(getWorld(), MAX_DISTANCE_BETWEEN_MARKERS, 0, 0));
+
+        assertTrue(result.isOk());
+        assertNotEquals(firstBoundary, result.unwrap());
+        assertNotEquals(secondBoundary, result.unwrap());
     }
 
     @NotNull

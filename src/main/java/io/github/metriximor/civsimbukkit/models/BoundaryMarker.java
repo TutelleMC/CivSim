@@ -15,7 +15,6 @@ import org.bukkit.inventory.ItemStack;
 
 public class BoundaryMarker {
     private static final NamespacedKey INDEX_KEY = getKey("boundary_index");
-
     private final int index;
 
     public BoundaryMarker(final int index) {
