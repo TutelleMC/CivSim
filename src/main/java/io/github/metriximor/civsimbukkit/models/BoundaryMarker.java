@@ -19,6 +19,9 @@ public class BoundaryMarker {
     private final int index;
 
     public BoundaryMarker(final int index) {
+        if (index < 0) {
+            throw new IllegalArgumentException("Index can't be lower than 0");
+        }
         this.index = index;
     }
 
@@ -34,6 +37,7 @@ public class BoundaryMarker {
                 && meta.getPersistentDataContainer().has(INDEX_KEY);
     }
 
+    @NonNull
     public static Optional<Integer> getIndexFromItemStack(@NonNull final ItemStack boundaryMarker) {
         if (!isBoundaryMarker(boundaryMarker)) {
             return Optional.empty();
@@ -42,10 +46,12 @@ public class BoundaryMarker {
                 boundaryMarker.getItemMeta().getPersistentDataContainer().get(INDEX_KEY, DataType.INTEGER));
     }
 
-    public PlacedBoundaryMarker place(@NonNull final Location location) {
+    @NonNull
+    public PlacedBoundaryMarker placeAt(@NonNull final Location location) {
         return new PlacedBoundaryMarker(location);
     }
 
+    @NonNull
     public ItemStack getAsArmorStand() {
         var armorStand = new ItemStack(Material.ARMOR_STAND);
         armorStand.editMeta(meta -> meta.displayName(

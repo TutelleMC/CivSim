@@ -31,9 +31,8 @@ import lombok.NonNull;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A result type that contains either an value or an error.
- * <p>
- * It is inspired by the Result type in the Rust programming language.
+ * A result type that contains either a value or an error.
+ * <p>It is inspired by the Result type in the Rust programming language.
  *
  * @param <T> the ok value
  * @param <E> the error value
@@ -213,7 +212,7 @@ public class Result<T, E> implements Iterable<T> {
     /**
      * Create a success result.
      *
-     * @param ok  The value.
+     * @param ok The value.
      * @param <T> The success type.
      * @param <E> Ignored.
      * @return A success result.
@@ -232,13 +231,6 @@ public class Result<T, E> implements Iterable<T> {
      */
     public static <T, E> Result<T, E> err(@NonNull final E err) {
         return new Result<>(null, err);
-    }
-
-    public static <T, E> Result<T, E> ofNullable(final T value, @NonNull final E err) {
-        if (value == null) {
-            return err(err);
-        }
-        return ok(value);
     }
 
     public Stream<T> stream() {

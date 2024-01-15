@@ -13,7 +13,7 @@ public class PlacedBoundaryMarker {
     private @NonNull final Location location;
 
     public double distanceToSquared(@NonNull final Location location) {
-        return this.location.distance(location);
+        return this.location.distanceSquared(location);
     }
 
     @NonNull

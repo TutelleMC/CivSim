@@ -50,8 +50,9 @@ import org.bukkit.inventory.ItemStack;
 
 public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends NodeService<T> {
     String DEFINING_BOUNDARIES_MSG =
-            "Place down the boundary marker to start! Type %s/civsim boundary done%s%s when finished or %s/civsim boundary cancel%s%s to cancel"
+            "Place the boundary marker to start! Type %s%s/civsim boundary done%s%s when finished or %s/civsim boundary cancel%s%s to cancel"
                     .formatted(
+                            ChatColor.RESET,
                             ChatColor.ITALIC,
                             ChatColor.RESET,
                             ChatColor.GREEN,
@@ -123,14 +124,15 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             if (area > MAX_AREA_POLYGON) {
                 return err(AddBoundaryError.AREA_TOO_BIG);
             }
-            if (polygon.edgeIsSelfIntersecting(pair.right().get(pair.right().size() - 1).asPoint2d(), currentPoint)) {
+            if (polygon.edgeIsSelfIntersecting(
+                    pair.right().get(pair.right().size() - 1).asPoint2d(), currentPoint)) {
                 return err(AddBoundaryError.SELF_INTERSECTING);
             }
         }
         if (index >= MAX_POLYGON_POINTS) {
             return err(AddBoundaryError.TOO_MANY_BOUNDARY_MARKERS);
         }
-        pair.right().add(new BoundaryMarker(index).place(location));
+        pair.right().add(new BoundaryMarker(index).placeAt(location));
         final var boundaryMarker = new BoundaryMarker(index + 1);
         return ok(boundaryMarker.getAsArmorStand());
     }

@@ -111,6 +111,21 @@ class FarmNodeServiceTest extends BukkitTest {
         assertTrue(farmNodeService.copyWages(barrel).isEmpty());
     }
 
+    @Test
+    void testDefineBoundariesReturnsEmptyWhenBlockIsNotNode() {
+        final var block = setupBarrelBlock();
+        final var player = setupPlayer();
+        assertTrue(farmNodeService.defineBoundaries(player, block).isEmpty());
+    }
+
+    @Test
+    void testDefineBoundariesReturnsNonEmptyWhenBlockIsNode() {
+        final var block = setupBarrelBlock();
+        final var player = setupPlayer();
+        farmNodeService.registerNode(block);
+        assertTrue(farmNodeService.defineBoundaries(player, block).isPresent());
+    }
+
     @NotNull
     private BillOfMaterials getSampleWages() {
         final var bill = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);

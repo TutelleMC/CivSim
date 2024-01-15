@@ -48,7 +48,8 @@ public class BoundaryListener implements Listener {
         }
         final var itemStack = mainHandIsBoundaryMarker ? mainHand : offHand;
 
-        // When updating to 1.20, we can update this to hide for everyone. As it stands it's going to be wack
+        // When updating to 1.20, we can update this to hide for everyone. As it stands
+        // it's going to be wack
         Bukkit.getOnlinePlayers().forEach(onlinePlayer -> onlinePlayer.hideEntity(plugin, event.getEntity()));
         player.showEntity(plugin, event.getEntity());
 
@@ -57,7 +58,7 @@ public class BoundaryListener implements Listener {
         if (nextMarker.isErr()) {
             final String errorMessage =
                     switch (nextMarker.unwrapErr()) {
-                        case CONTACT_ADMIN -> "Error, if you see this message contact an admin";
+                        case CONTACT_ADMIN -> "Error, if you see this message please contact an admin";
                         case NOT_A_BOUNDARY_MARKER -> "Placed armor stand is not a boundary";
                         case NO_INDEX -> "Boundary Marker has no index, please contact an admin";
                         case NOT_IN_BOUNDARY_EDITING_MODE -> "You are not in boundary editing mode";

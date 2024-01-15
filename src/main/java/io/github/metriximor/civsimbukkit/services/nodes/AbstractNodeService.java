@@ -1,12 +1,13 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
-import io.github.metriximor.civsimbukkit.models.AbstractNode;
+import static io.github.metriximor.civsimbukkit.models.AbstractNode.isNode;
+
 import io.github.metriximor.civsimbukkit.models.nodes.Node;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import io.github.metriximor.civsimbukkit.services.SimulationService;
 import io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils;
-import java.util.*;
+import java.util.Optional;
 import java.util.logging.Logger;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -30,7 +31,7 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
     private final SimulationService simulationService;
 
     public boolean blockIsNotNode(final Block block) {
-        return !AbstractNode.isNode(block);
+        return !isNode(block);
     }
 
     public abstract T build(@NonNull final Block block);
@@ -40,6 +41,9 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         final T result = nodeRepository.getById(block);
         if (result != null) {
             return result;
+        }
+        if (!isNode(block)) {
+            return null;
         }
         final T node = build(block);
         if (node == null) {
