@@ -2,6 +2,7 @@ package io.github.metriximor.civsimbukkit.services;
 
 import static io.github.metriximor.civsimbukkit.models.AbstractNode.isOfType;
 import static io.github.metriximor.civsimbukkit.services.nodes.PolygonalAreaFunctionality.MAX_DISTANCE_BETWEEN_MARKERS;
+import static io.github.metriximor.civsimbukkit.services.nodes.PolygonalAreaFunctionality.MAX_POLYGON_POINTS;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -11,10 +12,16 @@ import io.github.metriximor.civsimbukkit.models.*;
 import io.github.metriximor.civsimbukkit.models.errors.PlaceBoundaryError;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
+import io.github.metriximor.civsimbukkit.utils.Result;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
+import java.util.stream.IntStream;
+import lombok.NonNull;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -203,6 +210,71 @@ class FarmNodeServiceTest extends BukkitTest {
         assertTrue(result.isOk());
         assertNotEquals(firstBoundary, result.unwrap());
         assertNotEquals(secondBoundary, result.unwrap());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenPolygonIsSelfIntersecting() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var firstBoundary =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var secondBoundary = farmNodeService
+                .placeBoundary(player, firstBoundary, new Location(getWorld(), 0, 0, 0))
+                .unwrap();
+        final var thirdBoundary = farmNodeService
+                .placeBoundary(player, secondBoundary, new Location(getWorld(), MAX_DISTANCE_BETWEEN_MARKERS, 0, 0))
+                .unwrap();
+        final var result = farmNodeService.placeBoundary(
+                player, thirdBoundary, new Location(getWorld(), MAX_DISTANCE_BETWEEN_MARKERS / 2, 0, 0));
+
+        assertTrue(result.isErr());
+        assertEquals(PlaceBoundaryError.SELF_INTERSECTING, result.unwrapErr());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenPolygonAreaIsTooBig() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var firstBoundary =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var secondBoundary = placeBound(firstBoundary, 0, 0, player).unwrap();
+        final var thirdBound = placeBound(secondBoundary, 25, 0, player).unwrap();
+        final var fourth = placeBound(thirdBound, 50, 0, player).unwrap();
+        final var fifth = placeBound(fourth, 75, 0, player).unwrap();
+        final var sixth = placeBound(fifth, 75, 0, player).unwrap();
+        final var seventh = placeBound(sixth, 100, 0, player).unwrap();
+        final var eigth = placeBound(seventh, 100, 25, player).unwrap();
+        final var ninth = placeBound(eigth, 100, 50, player);
+        assertTrue(ninth.isOk());
+        final var result = placeBound(ninth.unwrap(), 100, 75, player);
+        assertTrue(result.isErr());
+        assertEquals(PlaceBoundaryError.AREA_TOO_BIG, result.unwrapErr());
+    }
+
+    @Test
+    void testPlaceBoundariesReturnsErrorWhenTooManyBoundariesArePlaced() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var firstBoundary =
+                farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var bounds = new ArrayList<>(List.of(firstBoundary));
+        IntStream.range(0, MAX_POLYGON_POINTS).forEach(i -> {
+            final var bound = placeBound(bounds.get(i), 25 * i, 0, player);
+            assertTrue(bound.isOk());
+            bounds.add(bound.unwrap());
+        });
+        final var tooManyBoundaries = placeBound(bounds.get(bounds.size() - 1), 25 * MAX_POLYGON_POINTS, 0, player);
+        assertTrue(tooManyBoundaries.isErr());
+        assertEquals(PlaceBoundaryError.TOO_MANY_BOUNDARY_MARKERS, tooManyBoundaries.unwrapErr());
+    }
+
+    @NonNull
+    private Result<ItemStack, PlaceBoundaryError> placeBound(
+            @NonNull final ItemStack previous, final double x, final double z, @NonNull final Player player) {
+        return farmNodeService.placeBoundary(player, previous, new Location(getWorld(), x, 0, z));
     }
 
     @NotNull

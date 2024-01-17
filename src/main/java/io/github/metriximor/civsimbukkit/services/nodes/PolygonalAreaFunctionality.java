@@ -24,6 +24,7 @@ package io.github.metriximor.civsimbukkit.services.nodes;
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.getIndexFromItemStack;
 import static io.github.metriximor.civsimbukkit.utils.Result.err;
 import static io.github.metriximor.civsimbukkit.utils.Result.ok;
+import static io.github.metriximor.civsimbukkit.utils.SegmentUtils.intersect;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
 
 import io.github.metriximor.civsimbukkit.models.BoundaryMarker;
@@ -39,6 +40,7 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -106,7 +108,18 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             getParticleService()
                     .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.PURPLE, player);
         }
-        if (index >= 3) {
+        if (index >= 1) {
+            final var points = new ArrayList<>(
+                    pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());
+            final var edges =
+                    IntStream.range(0, points.size() - 1).mapToObj(i -> Pair.of(points.get(i), points.get(i + 1)));
+            final var previousPoint = points.get(points.size() - 1);
+            final var currentPoint = new Point(location.getBlockX(), location.getBlockZ());
+            if (edges.anyMatch(edge -> intersect(edge.left(), edge.right(), previousPoint, currentPoint))) {
+                return err(PlaceBoundaryError.SELF_INTERSECTING);
+            }
+        }
+        if (index >= 2) {
             final var currentPoint = new Point(location.getBlockX(), location.getBlockZ());
             final var points = new ArrayList<>(
                     pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());
@@ -119,10 +132,6 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             var area = polygon.area();
             if (area > MAX_AREA_POLYGON) {
                 return err(PlaceBoundaryError.AREA_TOO_BIG);
-            }
-            if (polygon.edgeIsSelfIntersecting(
-                    pair.right().get(pair.right().size() - 1).asPoint2d(), currentPoint)) {
-                return err(PlaceBoundaryError.SELF_INTERSECTING);
             }
         }
         if (index >= MAX_POLYGON_POINTS) {
@@ -138,6 +147,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         if (pair == null) {
             return false;
         }
+        // TODO add check for last connection not self intersecting
         final var node = pair.left();
         final var polygon = Polygon.build(
                 pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());

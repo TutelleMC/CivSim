@@ -15,15 +15,16 @@ public class SegmentUtils {
         }
         final var interceptionPoint = calculateInterceptionPoint(p1, p2, q1, q2);
         if (interceptionPoint == null) { // slope is 0
-            return boundaryBoxesTouch(p1, p2, q1, q2);
+            return boundaryBoxesDontBorderAtASinglePoint(p1, p2, q1, q2);
         }
+        //noinspection EqualsBetweenInconvertibleTypes they are tested and work fine
         return !interceptionPoint.equals(p1)
                 && !interceptionPoint.equals(p2)
                 && !interceptionPoint.equals(q1)
                 && !interceptionPoint.equals(q2);
     }
 
-    private static boolean boundaryBoxesTouch(
+    private static boolean boundaryBoxesDontBorderAtASinglePoint(
             @NonNull final Point p1, @NonNull final Point p2, @NonNull final Point q1, @NonNull final Point q2) {
         final Point bb1TopLeft = new Point(Math.min(p1.x, p2.x), Math.max(p1.y, p2.y));
         final Point bb1BottomRight = new Point(Math.max(p1.x, p2.x), Math.min(p1.y, p2.y));
@@ -35,6 +36,7 @@ public class SegmentUtils {
         }
         if (bb1TopLeft.y != bb1BottomRight.y || bb2TopLeft.y != bb2BottomRight.y) {
             if (bb1TopLeft.y == bb2BottomRight.y) return false; // Below
+            //noinspection RedundantIfStatement this way makes more sense in my brain
             if (bb1BottomRight.y == bb2TopLeft.y) return false; // Above
         }
         return true;

@@ -1,8 +1,6 @@
 package io.github.metriximor.civsimbukkit.utils;
 
-import static java.awt.geom.Line2D.linesIntersect;
-
-import java.awt.*;
+import java.awt.Point;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -46,25 +44,13 @@ public class Polygon extends java.awt.Polygon {
                 / 2d);
     }
 
-    public boolean edgeIsSelfIntersecting(Point edgeStart, Point edgeEnd) {
-        return getEdgesOfPolygon()
-                .anyMatch(edge -> linesIntersect(
-                        edge.left().x,
-                        edge.left().y,
-                        edge.right().x,
-                        edge.right().y,
-                        edgeStart.x,
-                        edgeStart.y,
-                        edgeEnd.x,
-                        edgeEnd.y));
-    }
-
     private Stream<Point> getPointsOfPolygon() {
         return IntStream.range(0, npoints).mapToObj(i -> new Point(xpoints[i], ypoints[i]));
     }
 
-    private Stream<Pair<Point, Point>> getEdgesOfPolygon() {
-        return IntStream.range(0, npoints - 1)
-                .mapToObj(i -> Pair.of(new Point(xpoints[i], ypoints[i]), new Point(xpoints[i + 1], ypoints[i + 1])));
-    }
+    //    private Stream<Pair<Point, Point>> getEdgesOfPolygon() {
+    //        return IntStream.range(0, npoints - 1)
+    //                .mapToObj(i -> Pair.of(new Point(xpoints[i], ypoints[i]), new Point(xpoints[i + 1], ypoints[i +
+    // 1])));
+    //    }
 }
