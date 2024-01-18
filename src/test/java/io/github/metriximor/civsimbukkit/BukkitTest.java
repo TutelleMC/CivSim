@@ -38,6 +38,13 @@ public class BukkitTest {
     }
 
     @NotNull
+    protected Block setupBarrelBlock(final int x, final int y, final int z) {
+        final Block barrel = world.createBlock(new Coordinate(x, y, z));
+        barrel.setType(Material.BARREL);
+        return barrel;
+    }
+
+    @NotNull
     protected PlayerMock setupPlayer() {
         return server.addPlayer();
     }

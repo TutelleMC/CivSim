@@ -139,6 +139,18 @@ class FarmNodeServiceTest extends BukkitTest {
     }
 
     @Test
+    void testDefineBoundariesReturnsEmptyWhenPlayerIsAlreadyEditingAnotherNode() {
+        final var block = setupBarrelBlock();
+        final var player = setupPlayer();
+        farmNodeService.registerNode(block);
+        farmNodeService.defineBoundaries(player, block);
+        final var otherBlock = setupBarrelBlock(1,1,1);
+        farmNodeService.registerNode(otherBlock);
+
+        assertTrue(farmNodeService.defineBoundaries(player, otherBlock).isEmpty());
+    }
+
+    @Test
     void testPlaceBoundariesReturnsErrorWhenItemIsNotABoundaryMarker() {
         final var player = setupPlayer();
         final var location = new Location(getWorld(), 1, 1, 1);
