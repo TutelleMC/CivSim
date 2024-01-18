@@ -1,9 +1,12 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.isBoundaryMarker;
+import static io.github.metriximor.civsimbukkit.services.nodes.PolygonalAreaFunctionality.PLAYER_UUID_KEY;
+import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getMarkerKey;
 import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.*;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
+import com.jeff_media.morepersistentdatatypes.DataType;
 import io.github.metriximor.civsimbukkit.models.BoundaryMarker;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
@@ -13,11 +16,13 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityPlaceEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
 @RequiredArgsConstructor
@@ -76,6 +81,8 @@ public class BoundaryListener implements Listener {
             return;
         }
         replaceItemInInventory(player, itemStack, nextMarker.unwrap());
+        event.getEntity().getPersistentDataContainer().set(getMarkerKey(), PersistentDataType.BYTE, (byte) 2);
+        event.getEntity().getPersistentDataContainer().set(PLAYER_UUID_KEY, DataType.UUID, player.getUniqueId());
     }
 
     @EventHandler
@@ -96,6 +103,23 @@ public class BoundaryListener implements Listener {
         }
         event.setCancelled(true);
         event.getPlayer().sendMessage(getFailMessage("Can't drop a boundary marker"));
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerAttackBoundaryMarker(@NonNull final EntityDamageEvent event) {
+        if (!event.getEntityType().equals(EntityType.ARMOR_STAND)) {
+            return;
+        }
+        if (!event.getEntity().getPersistentDataContainer().has(getMarkerKey())) {
+            return;
+        }
+        final var playerUUID = event.getEntity().getPersistentDataContainer().get(PLAYER_UUID_KEY, DataType.UUID);
+        final var player = Bukkit.getPlayer(playerUUID);
+        if (player == null) {
+            logger.severe("Attempted to find player with UUID %s but couldn't find it".formatted(playerUUID));
+            return;
+        }
+        farmNodeService.cancelBoundarySelection(player);
     }
 
     @EventHandler

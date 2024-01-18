@@ -22,6 +22,7 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.getIndexFromItemStack;
+import static io.github.metriximor.civsimbukkit.utils.NamespacedKeyUtils.getKey;
 import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.removeAllItemsThatSatisfyCondition;
 import static io.github.metriximor.civsimbukkit.utils.Result.err;
 import static io.github.metriximor.civsimbukkit.utils.Result.ok;
@@ -48,6 +49,7 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.Entity;
@@ -55,6 +57,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends NodeService<T> {
+    NamespacedKey PLAYER_UUID_KEY = getKey("boundary_player_key");
     String DEFINING_BOUNDARIES_MSG =
             "Place the boundary marker to start! Type %s%s/civsim boundary done%s%s when finished or %s/civsim boundary cancel%s%s to cancel"
                     .formatted(
@@ -104,19 +107,6 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
                             .formatted(player, location));
             return err(PlaceBoundaryError.NOT_IN_BOUNDARY_EDITING_MODE);
         }
-        if (index > 0) {
-            final var previousBoundary = pair.right().get(index - 1);
-            if (previousBoundary.distanceToSquared(location) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {
-                return err(PlaceBoundaryError.DISTANCE_TOO_BIG);
-            }
-            final var previousLocation = previousBoundary.getLocation().clone();
-            final var particleCurrentLocation = location.clone();
-
-            previousLocation.add(0, 0.5, 0);
-            particleCurrentLocation.add(0, 0.5, 0);
-            getParticleService()
-                    .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.PURPLE, player);
-        }
         if (index >= 1) {
             final var points = new ArrayList<>(
                     pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());
@@ -145,6 +135,19 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         }
         if (index >= MAX_POLYGON_POINTS) {
             return err(PlaceBoundaryError.TOO_MANY_BOUNDARY_MARKERS);
+        }
+        if (index > 0) {
+            final var previousBoundary = pair.right().get(index - 1);
+            if (previousBoundary.distanceToSquared(location) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {
+                return err(PlaceBoundaryError.DISTANCE_TOO_BIG);
+            }
+            final var previousLocation = previousBoundary.getLocation().clone();
+            final var particleCurrentLocation = location.clone();
+
+            previousLocation.add(0, 0.5, 0);
+            particleCurrentLocation.add(0, 0.5, 0);
+            getParticleService()
+                    .drawLine(getParticleKey(player), previousLocation, particleCurrentLocation, Color.PURPLE, player);
         }
         pair.right().add(new BoundaryMarker(index).placeAt(location));
         final var boundaryMarker = new BoundaryMarker(index + 1);
