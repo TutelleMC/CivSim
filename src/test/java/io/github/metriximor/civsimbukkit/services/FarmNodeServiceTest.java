@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 import io.github.metriximor.civsimbukkit.BukkitTest;
 import io.github.metriximor.civsimbukkit.models.*;
 import io.github.metriximor.civsimbukkit.models.errors.PlaceBoundaryError;
+import io.github.metriximor.civsimbukkit.models.errors.RegisterBoundaryError;
 import io.github.metriximor.civsimbukkit.repositories.InMemoryRepository;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import io.github.metriximor.civsimbukkit.utils.Result;
@@ -269,6 +270,90 @@ class FarmNodeServiceTest extends BukkitTest {
         final var tooManyBoundaries = placeBound(bounds.get(bounds.size() - 1), 25 * MAX_POLYGON_POINTS, 0, player);
         assertTrue(tooManyBoundaries.isErr());
         assertEquals(PlaceBoundaryError.TOO_MANY_BOUNDARY_MARKERS, tooManyBoundaries.unwrapErr());
+    }
+
+    @Test
+    void testRegisterBoundariesHappyPath() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var second = placeBound(bound, 0, 0, player).unwrap();
+        final var third = placeBound(second, 10, 0, player).unwrap();
+        final var fourth = placeBound(third, 10, 10, player).unwrap();
+        placeBound(fourth, 0, 10, player);
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isOk());
+        assertTrue(result.unwrap());
+    }
+
+    @Test
+    void testRegisterBoundariesFailsWhenPlayerHasNotSetupBoundaries() {
+        final var player = setupPlayer();
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.NOT_REGISTERING_BOUNDARIES, result.unwrapErr());
+    }
+
+    @Test
+    void testRegisterBoundariesFailsWhenOnlyOneBoundaryHasBeenPlaced() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        placeBound(bound, 0, 0, player).unwrap();
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.INVALID_POLYGON, result.unwrapErr());
+    }
+
+    @Test
+    void testRegisterBoundariesFailsWhenAreaIsTooSmall() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var second = placeBound(bound, 0, 0, player).unwrap();
+        final var third = placeBound(second, 10, 0, player).unwrap();
+        placeBound(third, 20, 0, player).unwrap();
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.AREA_TOO_SMALL, result.unwrapErr());
+    }
+
+    @Test
+    void testRegisterBoundariesFailsWhenTheLastPathDistanceIsTooBig() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var second = placeBound(bound, 0, 0, player).unwrap();
+        final var third = placeBound(second, MAX_DISTANCE_BETWEEN_MARKERS, 0, player).unwrap();
+        final var fourth = placeBound(third, MAX_DISTANCE_BETWEEN_MARKERS, MAX_DISTANCE_BETWEEN_MARKERS, player).unwrap();
+        placeBound(fourth, MAX_DISTANCE_BETWEEN_MARKERS, MAX_DISTANCE_BETWEEN_MARKERS * 2, player);
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.DISTANCE_TOO_BIG, result.unwrapErr());
+    }
+
+    @Test
+    void testRegisterBoundariesFailsWhenTheLastSegmentIntersects() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock();
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var second = placeBound(bound, 0, 0, player).unwrap();
+        final var third = placeBound(second, 5, 0, player).unwrap();
+        final var fourth = placeBound(third, 5, 5, player).unwrap();
+        placeBound(fourth, 8, 5, player);
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.LAST_SEGMENT_INTERSECTS, result.unwrapErr());
     }
 
     @NonNull

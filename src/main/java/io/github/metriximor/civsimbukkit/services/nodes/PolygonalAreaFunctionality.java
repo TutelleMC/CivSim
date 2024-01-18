@@ -30,17 +30,21 @@ import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMess
 import io.github.metriximor.civsimbukkit.models.BoundaryMarker;
 import io.github.metriximor.civsimbukkit.models.PlacedBoundaryMarker;
 import io.github.metriximor.civsimbukkit.models.errors.PlaceBoundaryError;
+import io.github.metriximor.civsimbukkit.models.errors.RegisterBoundaryError;
 import io.github.metriximor.civsimbukkit.models.nodes.PolygonalArea;
 import io.github.metriximor.civsimbukkit.repositories.Repository;
 import io.github.metriximor.civsimbukkit.services.ParticleService;
 import io.github.metriximor.civsimbukkit.utils.Pair;
 import io.github.metriximor.civsimbukkit.utils.Polygon;
 import io.github.metriximor.civsimbukkit.utils.Result;
+
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
+
+import io.github.metriximor.civsimbukkit.utils.SegmentUtils;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -63,6 +67,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
     double MAX_DISTANCE_BETWEEN_MARKERS = 50d; // TODO load as configurable
     double MAX_DISTANCE_BETWEEN_MARKERS_SQUARED = MAX_DISTANCE_BETWEEN_MARKERS * MAX_DISTANCE_BETWEEN_MARKERS;
     double MAX_AREA_POLYGON = 2500d; // TODO load as configurable through function or smth
+    double MIN_AREA_POLYGON = 4d;
     int MAX_POLYGON_POINTS = 50; // TODO configurable
 
     Repository<Player, Pair<PolygonalArea, List<PlacedBoundaryMarker>>> getPolygonalAreasRepo();
@@ -72,6 +77,9 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
     default Optional<ItemStack> defineBoundaries(@NonNull final Player player, @NonNull final Block nodeBlock) {
         final PolygonalArea node = getNode(nodeBlock);
         if (node == null) {
+            return Optional.empty();
+        }
+        if (getPolygonalAreasRepo().getById(player) != null) {
             return Optional.empty();
         }
         player.sendMessage(getSuccessMessage(DEFINING_BOUNDARIES_MSG));
@@ -142,21 +150,35 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         return ok(boundaryMarker.getAsArmorStand());
     }
 
-    default boolean registerBoundaries(@NonNull final Player player) {
+    default Result<Boolean, RegisterBoundaryError> registerBoundaries(@NonNull final Player player) {
         final var pair = getPolygonalAreasRepo().getById(player);
         if (pair == null) {
-            return false;
+            return err(RegisterBoundaryError.NOT_REGISTERING_BOUNDARIES);
         }
-        // TODO add check for last connection not self intersecting
         final var node = pair.left();
         final var polygon = Polygon.build(
                 pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList());
         if (polygon == null) {
-            return false;
+            return err(RegisterBoundaryError.INVALID_POLYGON);
+        }
+        if (polygon.area() < MIN_AREA_POLYGON) {
+            return err(RegisterBoundaryError.AREA_TOO_SMALL);
+        }
+        final var lastPoint = pair.right().get(pair.right().size() - 1);
+        final var firstPoint = pair.right().get(0);
+        if (lastPoint.distanceToSquared(firstPoint) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {
+            return err(RegisterBoundaryError.DISTANCE_TOO_BIG);
+        }
+        final var points = pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList();
+        final var lastEdgeIntersects = IntStream.range(0, pair.right().size() - 1)
+                .mapToObj(i -> Pair.of(points.get(i), points.get(i + 1)))
+                .anyMatch(edge -> SegmentUtils.intersect(edge.left(), edge.right(), lastPoint.asPoint2d(), firstPoint.asPoint2d()));
+        if (lastEdgeIntersects) {
+            return err(RegisterBoundaryError.LAST_SEGMENT_INTERSECTS);
         }
         getPolygonalAreasRepo().remove(player);
         getParticleService().removeAll(getParticleKey(player));
-        return node.setArea(polygon);
+        return ok(node.setArea(polygon));
     }
 
     private static String getParticleKey(@NonNull final Player player) {

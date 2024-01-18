@@ -16,6 +16,10 @@ public class PlacedBoundaryMarker {
         return this.location.distanceSquared(location);
     }
 
+    public double distanceToSquared(@NonNull final PlacedBoundaryMarker other) {
+        return this.location.distanceSquared(other.location);
+    }
+
     @NonNull
     public Point asPoint2d() {
         return new Point(location.getBlockX(), location.getBlockZ());
