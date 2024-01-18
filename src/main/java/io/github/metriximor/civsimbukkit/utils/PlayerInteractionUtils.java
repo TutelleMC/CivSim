@@ -9,9 +9,9 @@ import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
 
 public class PlayerInteractionUtils {
-    public static void giveItemToPlayer(@NotNull final Player player, final ItemStack farmItem) {
+    public static void giveItemToPlayer(@NonNull final Player player, final ItemStack itemStack) {
         // Add item to player
-        final var droppedItem = player.getInventory().addItem(farmItem);
+        final var droppedItem = player.getInventory().addItem(itemStack);
         droppedItem.forEach((idx, item) -> player.getWorld().dropItem(player.getLocation(), item));
     }
 
@@ -22,5 +22,11 @@ public class PlayerInteractionUtils {
                 .filter(Objects::nonNull)
                 .filter(condition::apply)
                 .forEach(inventory::remove);
+    }
+
+    public static void replaceItemInInventory(
+            @NonNull final Player player, @NonNull final ItemStack oldItem, @NonNull final ItemStack newItem) {
+        final var inventory = player.getInventory();
+        inventory.setItem(inventory.first(oldItem), newItem);
     }
 }

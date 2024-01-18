@@ -49,6 +49,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
@@ -177,20 +179,28 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         if (lastEdgeIntersects) {
             return err(RegisterBoundaryError.LAST_SEGMENT_INTERSECTS);
         }
-        getPolygonalAreasRepo().remove(player);
-        getParticleService().removeAll(getParticleKey(player));
-        removeAllItemsThatSatisfyCondition(player, BoundaryMarker::isBoundaryMarker);
+        handleExitingEditingMode(player, pair);
         return ok(node.setArea(polygon));
     }
 
     default boolean cancelBoundarySelection(@NonNull final Player player) {
-        if (getPolygonalAreasRepo().getById(player) == null) {
+        final var pair = getPolygonalAreasRepo().getById(player);
+        if (pair == null) {
             return false;
         }
+        handleExitingEditingMode(player, pair);
+        return true;
+    }
+
+    private void handleExitingEditingMode(
+            @NonNull final Player player, @NonNull final Pair<PolygonalArea, List<PlacedBoundaryMarker>> pair) {
+        pair.right().stream()
+                .map(PlacedBoundaryMarker::getLocation)
+                .flatMap(location -> location.getNearbyEntitiesByType(ArmorStand.class, 1).stream())
+                .forEach(Entity::remove);
         getPolygonalAreasRepo().remove(player);
         getParticleService().removeAll(getParticleKey(player));
         removeAllItemsThatSatisfyCondition(player, BoundaryMarker::isBoundaryMarker);
-        return true;
     }
 
     private static String getParticleKey(@NonNull final Player player) {

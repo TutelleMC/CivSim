@@ -1,9 +1,10 @@
 package io.github.metriximor.civsimbukkit.listeners;
 
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.isBoundaryMarker;
-import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.*;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
 
+import io.github.metriximor.civsimbukkit.models.BoundaryMarker;
 import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.logging.Logger;
 import lombok.NonNull;
@@ -13,6 +14,10 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPlaceEvent;
+import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.Plugin;
 
 @RequiredArgsConstructor
@@ -70,8 +75,31 @@ public class BoundaryListener implements Listener {
             event.setCancelled(true);
             return;
         }
+        replaceItemInInventory(player, itemStack, nextMarker.unwrap());
+    }
 
-        // TODO replace the current boundary marker, not add to next slot
-        giveItemToPlayer(player, nextMarker.unwrap());
+    @EventHandler
+    public void onPlayerLogout(@NonNull final PlayerQuitEvent event) {
+        farmNodeService.cancelBoundarySelection(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerDeath(@NonNull final PlayerDeathEvent event) {
+        farmNodeService.cancelBoundarySelection(event.getPlayer());
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onPlayerThrowBoundaryMarkerAway(@NonNull final PlayerDropItemEvent event) {
+        final var droppedItem = event.getItemDrop().getItemStack();
+        if (!BoundaryMarker.isBoundaryMarker(droppedItem)) {
+            return;
+        }
+        event.setCancelled(true);
+        event.getPlayer().sendMessage(getFailMessage("Can't drop a boundary marker"));
+    }
+
+    @EventHandler
+    public void onPlayerJoinEvent(@NonNull final PlayerJoinEvent event) {
+        removeAllItemsThatSatisfyCondition(event.getPlayer(), BoundaryMarker::isBoundaryMarker);
     }
 }
