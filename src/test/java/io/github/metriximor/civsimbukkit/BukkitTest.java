@@ -32,9 +32,7 @@ public class BukkitTest {
 
     @NotNull
     protected Block setupBarrelBlock() {
-        final Block barrel = world.createBlock(new Coordinate(0, 0, 0));
-        barrel.setType(Material.BARREL);
-        return barrel;
+        return setupBarrelBlock(0, 0, 0);
     }
 
     @NotNull

@@ -22,6 +22,7 @@
 package io.github.metriximor.civsimbukkit.services.nodes;
 
 import static io.github.metriximor.civsimbukkit.models.BoundaryMarker.getIndexFromItemStack;
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.removeAllItemsThatSatisfyCondition;
 import static io.github.metriximor.civsimbukkit.utils.Result.err;
 import static io.github.metriximor.civsimbukkit.utils.Result.ok;
 import static io.github.metriximor.civsimbukkit.utils.SegmentUtils.intersect;
@@ -37,14 +38,12 @@ import io.github.metriximor.civsimbukkit.services.ParticleService;
 import io.github.metriximor.civsimbukkit.utils.Pair;
 import io.github.metriximor.civsimbukkit.utils.Polygon;
 import io.github.metriximor.civsimbukkit.utils.Result;
-
+import io.github.metriximor.civsimbukkit.utils.SegmentUtils;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
-
-import io.github.metriximor.civsimbukkit.utils.SegmentUtils;
 import lombok.NonNull;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -169,16 +168,29 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         if (lastPoint.distanceToSquared(firstPoint) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {
             return err(RegisterBoundaryError.DISTANCE_TOO_BIG);
         }
-        final var points = pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList();
+        final var points =
+                pair.right().stream().map(PlacedBoundaryMarker::asPoint2d).toList();
         final var lastEdgeIntersects = IntStream.range(0, pair.right().size() - 1)
                 .mapToObj(i -> Pair.of(points.get(i), points.get(i + 1)))
-                .anyMatch(edge -> SegmentUtils.intersect(edge.left(), edge.right(), lastPoint.asPoint2d(), firstPoint.asPoint2d()));
+                .anyMatch(edge -> SegmentUtils.intersect(
+                        edge.left(), edge.right(), lastPoint.asPoint2d(), firstPoint.asPoint2d()));
         if (lastEdgeIntersects) {
             return err(RegisterBoundaryError.LAST_SEGMENT_INTERSECTS);
         }
         getPolygonalAreasRepo().remove(player);
         getParticleService().removeAll(getParticleKey(player));
+        removeAllItemsThatSatisfyCondition(player, BoundaryMarker::isBoundaryMarker);
         return ok(node.setArea(polygon));
+    }
+
+    default boolean cancelBoundarySelection(@NonNull final Player player) {
+        if (getPolygonalAreasRepo().getById(player) == null) {
+            return false;
+        }
+        getPolygonalAreasRepo().remove(player);
+        getParticleService().removeAll(getParticleKey(player));
+        removeAllItemsThatSatisfyCondition(player, BoundaryMarker::isBoundaryMarker);
+        return true;
     }
 
     private static String getParticleKey(@NonNull final Player player) {

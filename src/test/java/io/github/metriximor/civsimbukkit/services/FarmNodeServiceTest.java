@@ -144,7 +144,7 @@ class FarmNodeServiceTest extends BukkitTest {
         final var player = setupPlayer();
         farmNodeService.registerNode(block);
         farmNodeService.defineBoundaries(player, block);
-        final var otherBlock = setupBarrelBlock(1,1,1);
+        final var otherBlock = setupBarrelBlock(1, 1, 1);
         farmNodeService.registerNode(otherBlock);
 
         assertTrue(farmNodeService.defineBoundaries(player, otherBlock).isEmpty());
@@ -343,8 +343,10 @@ class FarmNodeServiceTest extends BukkitTest {
         farmNodeService.registerNode(block);
         final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
         final var second = placeBound(bound, 0, 0, player).unwrap();
-        final var third = placeBound(second, MAX_DISTANCE_BETWEEN_MARKERS, 0, player).unwrap();
-        final var fourth = placeBound(third, MAX_DISTANCE_BETWEEN_MARKERS, MAX_DISTANCE_BETWEEN_MARKERS, player).unwrap();
+        final var third =
+                placeBound(second, MAX_DISTANCE_BETWEEN_MARKERS, 0, player).unwrap();
+        final var fourth = placeBound(third, MAX_DISTANCE_BETWEEN_MARKERS, MAX_DISTANCE_BETWEEN_MARKERS, player)
+                .unwrap();
         placeBound(fourth, MAX_DISTANCE_BETWEEN_MARKERS, MAX_DISTANCE_BETWEEN_MARKERS * 2, player);
 
         final var result = farmNodeService.registerBoundaries(player);

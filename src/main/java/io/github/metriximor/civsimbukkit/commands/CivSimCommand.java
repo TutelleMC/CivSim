@@ -3,6 +3,7 @@ package io.github.metriximor.civsimbukkit.commands;
 import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
 import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
@@ -55,6 +56,39 @@ public class CivSimCommand extends BaseCommand {
 
         logger.info("%s bought a farm".formatted(player.getName()));
         player.sendMessage("You bought a farm: %s".formatted(farmItem));
+    }
+
+    @Subcommand("boundary")
+    public class BoundariesClass extends BaseCommand {
+        @Subcommand("done")
+        @Description("Confirm your boundary selection")
+        public void onDone(@NonNull final Player player) {
+            final var result = farmNodeService.registerBoundaries(player);
+            if (result.isOk()) {
+                player.sendMessage(getSuccessMessage("Boundaries registered successfully"));
+                return;
+            }
+            final var error = result.unwrapErr();
+            final var errorMessage =
+                    switch (error) {
+                        case NOT_REGISTERING_BOUNDARIES -> "Not in boundary editing mode";
+                        case INVALID_POLYGON -> "Boundaries don't have enough markers";
+                        case DISTANCE_TOO_BIG -> "Distance between boundaries is too big";
+                        case LAST_SEGMENT_INTERSECTS -> "The last segment would intersect an existing segment, try a different shape";
+                        case AREA_TOO_SMALL -> "The area of the boundaries is too small";
+                    };
+            player.sendMessage(getFailMessage(errorMessage));
+        }
+
+        @Subcommand("cancel")
+        @Description("Cancel your boundary selection")
+        public void onCancel(@NonNull final Player player) {
+            if (farmNodeService.cancelBoundarySelection(player)) {
+                player.sendMessage(getSuccessMessage("Canceled Boundary selection"));
+                return;
+            }
+            player.sendMessage(getFailMessage("Not in Boundary selection mode"));
+        }
     }
 
     @Subcommand("wages")
