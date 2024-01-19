@@ -76,6 +76,7 @@ public class CivSimCommand extends BaseCommand {
                         case DISTANCE_TOO_BIG -> "Distance between boundaries is too big";
                         case LAST_SEGMENT_INTERSECTS -> "The last segment would intersect an existing segment, try a different shape";
                         case AREA_TOO_SMALL -> "The area of the boundaries is too small";
+                        case NODE_NOT_INSIDE_BOUNDARIES -> "The node block must be inside the boundaries";
                     };
             player.sendMessage(getFailMessage(errorMessage));
         }

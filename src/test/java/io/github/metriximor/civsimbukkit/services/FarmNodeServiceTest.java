@@ -301,6 +301,22 @@ class FarmNodeServiceTest extends BukkitTest {
     }
 
     @Test
+    void testRegisterBoundariesFailsWhenNodeIsNotInsideBoundaries() {
+        final var player = setupPlayer();
+        final var block = setupBarrelBlock(-10,0,-10);
+        farmNodeService.registerNode(block);
+        final var bound = farmNodeService.defineBoundaries(player, block).orElseThrow();
+        final var second = placeBound(bound, 0, 0, player).unwrap();
+        final var third = placeBound(second, 10, 0, player).unwrap();
+        final var fourth = placeBound(third, 10, 10, player).unwrap();
+        placeBound(fourth, 0, 10, player);
+
+        final var result = farmNodeService.registerBoundaries(player);
+        assertTrue(result.isErr());
+        assertEquals(RegisterBoundaryError.NODE_NOT_INSIDE_BOUNDARIES, result.unwrapErr());
+    }
+
+    @Test
     void testRegisterBoundariesFailsWhenPlayerHasNotSetupBoundaries() {
         final var player = setupPlayer();
         final var result = farmNodeService.registerBoundaries(player);
