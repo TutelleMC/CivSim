@@ -1,57 +1,52 @@
 package io.github.metriximor.civsimbukkit.controllers;
 
-import io.github.metriximor.civsimbukkit.gui.ToggleItem;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
-import java.util.List;
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
+
+import io.github.metriximor.civsimbukkit.gui.ClickableButton;
+import io.github.metriximor.civsimbukkit.gui.ToggleableButton;
+import io.github.metriximor.civsimbukkit.gui.WagesItem;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
-import xyz.xenondevs.inventoryaccess.component.AdventureComponentWrapper;
-import xyz.xenondevs.inventoryaccess.component.ComponentWrapper;
+import org.jetbrains.annotations.NotNull;
 import xyz.xenondevs.invui.gui.Gui;
-import xyz.xenondevs.invui.item.builder.ItemBuilder;
-import xyz.xenondevs.invui.item.impl.SimpleItem;
 import xyz.xenondevs.invui.window.Window;
 
 @RequiredArgsConstructor
 public class FarmUIController {
-    private final WorkableNodeService workableNodeService;
+    private final FarmNodeService farmNodeService;
 
     public void openNodeUI(@NonNull final Player player, @NonNull final Block block) {
-        if (workableNodeService.blockIsNotNode(block)) {
+        if (farmNodeService.blockIsNotNode(block)) {
             player.sendMessage("%sToggling non toggleable block. Please contact an admin!".formatted(ChatColor.RED));
             return;
         }
-        final boolean isEnabled = workableNodeService.isEnabled(block);
-
-        final var wagesLore = workableNodeService
-                .copyWages(block)
-                .map(bill -> bill.describe().stream()
-                        .map(component -> component.decorate(TextDecoration.ITALIC))
-                        .toList())
-                .orElse(List.of(Component.text("No wages configured!").color(NamedTextColor.RED)))
-                .stream()
-                .map(component -> (ComponentWrapper) new AdventureComponentWrapper(component))
-                .toList();
-        final var wagesItem = new SimpleItem(new ItemBuilder(Material.PAPER)
-                .addLoreLines(wagesLore)
-                .setDisplayName("%sWages".formatted(ChatColor.DARK_PURPLE)));
+        final boolean isEnabled = farmNodeService.isEnabled(block);
 
         final Gui gui = Gui.normal()
-                .setStructure("T W . . . . . . .")
-                .addIngredient('T', new ToggleItem(isEnabled, toggleCall -> workableNodeService.toggleNode(block)))
-                .addIngredient('W', wagesItem)
+                .setStructure("T W . . . . . B .")
+                .addIngredient('T', new ToggleableButton(isEnabled, toggleCall -> farmNodeService.toggleNode(block)))
+                .addIngredient(
+                        'W', new WagesItem(farmNodeService.copyWages(block).orElse(null)))
+                .addIngredient('B', new ClickableButton(click -> defineBoundary(player, block)))
                 .build();
         Window.single()
                 .setTitle("%sFarm Menu".formatted(ChatColor.DARK_GREEN))
                 .setGui(gui)
                 .build(player)
                 .open();
+    }
+
+    private void defineBoundary(@NotNull Player player, @NotNull Block block) {
+        var boundaryMarker = farmNodeService.defineBoundaries(player, block);
+        if (boundaryMarker.isEmpty()) {
+            player.sendMessage(getFailMessage("Failed to create boundary marker!"));
+            return;
+        }
+        giveItemToPlayer(player, boundaryMarker.get());
     }
 }

@@ -1,7 +1,9 @@
 package io.github.metriximor.civsimbukkit.commands;
 
 import static io.github.metriximor.civsimbukkit.services.BillOfMaterialsService.SetType.WAGES;
+import static io.github.metriximor.civsimbukkit.utils.PlayerInteractionUtils.giveItemToPlayer;
 import static io.github.metriximor.civsimbukkit.utils.StringUtils.getFailMessage;
+import static io.github.metriximor.civsimbukkit.utils.StringUtils.getSuccessMessage;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.CommandHelp;
@@ -10,7 +12,7 @@ import io.github.metriximor.civsimbukkit.CivSimBukkitPlugin;
 import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
 import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
-import io.github.metriximor.civsimbukkit.services.nodes.WorkableNodeService;
+import io.github.metriximor.civsimbukkit.services.nodes.FarmNodeService;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -24,14 +26,13 @@ import org.bukkit.block.Block;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.jetbrains.annotations.NotNull;
 
 @CommandAlias("civsim|csim|cim")
 @RequiredArgsConstructor
 @SuppressWarnings("unused")
 public class CivSimCommand extends BaseCommand {
     private final Logger logger;
-    private final WorkableNodeService workableNodeService;
+    private final FarmNodeService farmNodeService;
     private final BillOfMaterialsService billOfMaterialsService;
 
     @Subcommand("version")
@@ -45,7 +46,7 @@ public class CivSimCommand extends BaseCommand {
     public void onBuy(@NonNull final Player player, @NonNull final NodeType node) {
         final var farmItem = new ItemStack(Material.BARREL, 1);
 
-        workableNodeService.addMarker(farmItem);
+        farmNodeService.addMarker(farmItem);
 
         // Change the name
         final var displayName = Component.text("Farm").color(NamedTextColor.DARK_GREEN);
@@ -55,6 +56,39 @@ public class CivSimCommand extends BaseCommand {
 
         logger.info("%s bought a farm".formatted(player.getName()));
         player.sendMessage("You bought a farm: %s".formatted(farmItem));
+    }
+
+    @Subcommand("boundary")
+    public class BoundariesClass extends BaseCommand {
+        @Subcommand("done")
+        @Description("Confirm your boundary selection")
+        public void onDone(@NonNull final Player player) {
+            final var result = farmNodeService.registerBoundaries(player);
+            if (result.isOk()) {
+                player.sendMessage(getSuccessMessage("Boundaries registered successfully"));
+                return;
+            }
+            final var error = result.unwrapErr();
+            final var errorMessage =
+                    switch (error) {
+                        case NOT_REGISTERING_BOUNDARIES -> "Not in boundary editing mode";
+                        case INVALID_POLYGON -> "Boundaries don't have enough markers";
+                        case DISTANCE_TOO_BIG -> "Distance between boundaries is too big";
+                        case LAST_SEGMENT_INTERSECTS -> "The last segment would intersect an existing segment, try a different shape";
+                        case AREA_TOO_SMALL -> "The area of the boundaries is too small";
+                    };
+            player.sendMessage(getFailMessage(errorMessage));
+        }
+
+        @Subcommand("cancel")
+        @Description("Cancel your boundary selection")
+        public void onCancel(@NonNull final Player player) {
+            if (farmNodeService.cancelBoundarySelection(player)) {
+                player.sendMessage(getSuccessMessage("Canceled Boundary selection"));
+                return;
+            }
+            player.sendMessage(getFailMessage("Not in Boundary selection mode"));
+        }
     }
 
     @Subcommand("wages")
@@ -77,18 +111,18 @@ public class CivSimCommand extends BaseCommand {
         @Subcommand("remove")
         @Description("Removes the wages from the block that is being looked at")
         public void onGet(@NonNull final Player player) {
-            getWagesFromNode(player, workableNodeService::takeWages);
+            getWagesFromNode(player, farmNodeService::takeWages);
         }
 
         @Subcommand("copy")
         @Description("Copies the wages from the block that is being looked at without erasing the block's wages")
         public void onCopy(@NonNull final Player player) {
-            getWagesFromNode(player, workableNodeService::copyWages);
+            getWagesFromNode(player, farmNodeService::copyWages);
         }
 
         private void getWagesFromNode(final Player player, Function<Block, Optional<BillOfMaterials>> action) {
             final Block blockLookedAt = player.getTargetBlock(10);
-            if (workableNodeService.blockIsNotNode(blockLookedAt)) {
+            if (farmNodeService.blockIsNotNode(blockLookedAt)) {
                 player.sendMessage(getFailMessage("You must be looking at a workable building block"));
                 return;
             }
@@ -105,13 +139,5 @@ public class CivSimCommand extends BaseCommand {
     @HelpCommand
     public static void onHelp(final CommandSender sender, final CommandHelp help) {
         help.showHelp();
-    }
-
-    private static void giveItemToPlayer(@NotNull final Player player, final ItemStack farmItem) {
-        // Add item to player
-        final var droppedItem = player.getInventory().addItem(farmItem);
-        if (!droppedItem.isEmpty()) { // drop around the player if he can't fit it in inv
-            droppedItem.forEach((idx, item) -> player.getWorld().dropItem(player.getLocation(), item));
-        }
     }
 }

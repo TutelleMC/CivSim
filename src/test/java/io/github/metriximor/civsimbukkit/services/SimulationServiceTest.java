@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
-import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.nodes.Node;
-import io.github.metriximor.civsimbukkit.models.nodes.NodeBuilder;
+import io.github.metriximor.civsimbukkit.models.AbstractNode;
+import io.github.metriximor.civsimbukkit.models.FarmNode;
 import java.util.Objects;
 import java.util.logging.Logger;
 import lombok.NonNull;
@@ -29,10 +28,7 @@ class SimulationServiceTest extends BukkitTest {
     }
 
     @NonNull
-    private Node setupNode() {
-        return Objects.requireNonNull(new NodeBuilder()
-                .type(NodeType.WORKABLE)
-                .block(setupBarrelBlock())
-                .build());
+    private AbstractNode setupNode() {
+        return Objects.requireNonNull(FarmNode.build(setupBarrelBlock()));
     }
 }

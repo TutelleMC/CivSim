@@ -13,7 +13,7 @@ import xyz.xenondevs.invui.item.builder.ItemBuilder;
 import xyz.xenondevs.invui.item.impl.AbstractItem;
 
 @AllArgsConstructor
-public class ToggleItem extends AbstractItem {
+public class ToggleableButton extends AbstractItem {
     public record ToggleCall(
             ClickType clickType, Player player, InventoryClickEvent inventoryClickEvent, Boolean enabled) {}
 

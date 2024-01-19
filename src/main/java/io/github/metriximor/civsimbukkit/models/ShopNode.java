@@ -1,14 +1,14 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
-import io.github.metriximor.civsimbukkit.models.NodeType;
-import io.github.metriximor.civsimbukkit.models.Transaction;
 import lombok.NonNull;
 import org.bukkit.block.Block;
 import org.jetbrains.annotations.NotNull;
 
-public class ShopNode extends Node {
+public class ShopNode extends AbstractNode {
+    private static final NodeType TYPE = NodeType.SHOP;
+
     ShopNode(@NonNull Block block) {
-        super(block, NodeType.SHOP);
+        super(block, TYPE);
     }
 
     @Override
@@ -19,5 +19,12 @@ public class ShopNode extends Node {
     @Override
     public boolean perform() {
         throw new UnsupportedOperationException("TODO");
+    }
+
+    public static ShopNode build(@NonNull final Block block) {
+        if (!isOfType(block, TYPE)) {
+            return null;
+        }
+        return new ShopNode(block);
     }
 }

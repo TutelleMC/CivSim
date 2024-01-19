@@ -1,10 +1,8 @@
-package io.github.metriximor.civsimbukkit.models.nodes;
+package io.github.metriximor.civsimbukkit.models;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import io.github.metriximor.civsimbukkit.BukkitTest;
-import io.github.metriximor.civsimbukkit.models.BillOfMaterials;
-import io.github.metriximor.civsimbukkit.models.NodeType;
 import io.github.metriximor.civsimbukkit.services.BillOfMaterialsService;
 import lombok.NonNull;
 import org.bukkit.Material;
@@ -12,17 +10,17 @@ import org.bukkit.block.Block;
 import org.bukkit.inventory.ItemStack;
 import org.junit.jupiter.api.Test;
 
-class WorkableNodeTest extends BukkitTest {
+class FarmNodeTest extends BukkitTest {
     @Test
     void testNodeConstructsSuccessfully() {
         final var block = setupBarrelBlock();
-        assertNotNull(new NodeBuilder().type(NodeType.WORKABLE).block(block).build());
+        assertNotNull(FarmNode.build(block));
     }
 
     @Test
     void testWagesWorksCorrectly() {
         final var block = setupBarrelBlock();
-        final var node = setupWorkableNode(block);
+        final var node = setupFarmNode(block);
         final var wages = new BillOfMaterials(BillOfMaterialsService.SetType.WAGES);
         wages.add(new ItemStack(Material.IRON_INGOT));
 
@@ -47,29 +45,29 @@ class WorkableNodeTest extends BukkitTest {
     @Test
     void testIsNodeReturnsFalseWhenItemIsNotANode() {
         final var block = setupBarrelBlock();
-        assertFalse(Node.isNode(block));
+        assertFalse(AbstractNode.isNode(block));
     }
 
     @Test
     void testIsNodeReturnsTrueWhenItIsANode() {
         final var block = setupBarrelBlock();
-        setupWorkableNode(block);
-        assertTrue(Node.isNode(block));
+        setupFarmNode(block);
+        assertTrue(AbstractNode.isNode(block));
     }
 
     @Test
     void testTryToFindTypeWorksCorrectly() {
         final var block = setupBarrelBlock();
 
-        assertNull(Node.tryFindType(block));
+        assertNull(AbstractNode.tryFindType(block));
 
-        setupWorkableNode(block);
-        assertNotNull(Node.tryFindType(block));
+        setupFarmNode(block);
+        assertNotNull(AbstractNode.tryFindType(block));
     }
 
     @Test
     void testToggleWorksCorrectly() {
-        final var node = setupWorkableNode(setupBarrelBlock());
+        final var node = setupFarmNode(setupBarrelBlock());
 
         assertFalse(node.isEnabled());
         assertTrue(node.toggle());
@@ -80,14 +78,14 @@ class WorkableNodeTest extends BukkitTest {
 
     @Test
     void testPerformUpdatesInventoryCorrectly() {
-        final var node = setupWorkableNode(setupBarrelBlock());
+        final var node = setupFarmNode(setupBarrelBlock());
 
         assertTrue(node.getContainer().getInventory().isEmpty());
         assertTrue(node.perform(5));
         assertFalse(node.getContainer().getInventory().isEmpty());
     }
 
-    private WorkableNode setupWorkableNode(@NonNull final Block block) {
-        return new NodeBuilder().type(NodeType.WORKABLE).block(block).build();
+    private FarmNode setupFarmNode(@NonNull final Block block) {
+        return FarmNode.build(block);
     }
 }
