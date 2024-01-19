@@ -168,6 +168,10 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         if (polygon.area() < MIN_AREA_POLYGON) {
             return err(RegisterBoundaryError.AREA_TOO_SMALL);
         }
+        final var nodeLocation = pair.left().getLocation();
+        if (!polygon.contains(new Point(nodeLocation.getBlockX(), nodeLocation.getBlockZ()))) {
+            return err(RegisterBoundaryError.NODE_NOT_INSIDE_BOUNDARIES);
+        }
         final var lastPoint = pair.right().get(pair.right().size() - 1);
         final var firstPoint = pair.right().get(0);
         if (lastPoint.distanceToSquared(firstPoint) > MAX_DISTANCE_BETWEEN_MARKERS_SQUARED) {

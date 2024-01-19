@@ -9,6 +9,7 @@ import io.github.metriximor.civsimbukkit.utils.UUIDUtils;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
@@ -63,19 +64,28 @@ public abstract class AbstractNode implements Node {
         return existingType == null || existingType.equals(nodeType);
     }
 
+    @Override
     @NonNull
     public UUID getNodeId() {
         return uuid;
     }
 
+    @Override
     @NonNull
     public TileState getState() {
         return (TileState) block.getState();
     }
 
+    @Override
     @NonNull
     public Container getContainer() {
         return (Container) block.getState();
+    }
+
+    @Override
+    @NonNull
+    public Location getLocation() {
+        return block.getLocation();
     }
 
     public boolean isEnabled() {
@@ -102,6 +112,4 @@ public abstract class AbstractNode implements Node {
         }
         return result;
     }
-
-    public abstract boolean perform();
 }

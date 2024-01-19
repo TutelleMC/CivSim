@@ -2,6 +2,7 @@ package io.github.metriximor.civsimbukkit.models.nodes;
 
 import java.util.UUID;
 import lombok.NonNull;
+import org.bukkit.Location;
 import org.bukkit.block.Container;
 import org.bukkit.block.TileState;
 
@@ -14,6 +15,9 @@ public interface Node {
 
     @NonNull
     TileState getState();
+
+    @NonNull
+    Location getLocation();
 
     boolean isEnabled();
 
