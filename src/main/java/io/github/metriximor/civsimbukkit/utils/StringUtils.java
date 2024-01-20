@@ -6,11 +6,11 @@ import lombok.NonNull;
 import org.bukkit.ChatColor;
 
 public class StringUtils {
-    public static String convertToTitleCase(@NonNull final String text) {
+    public static String convertToTitleCase(final @NonNull String text) {
         return convertToTitleCaseSplitting(text, " ");
     }
 
-    public static String convertToTitleCaseSplitting(@NonNull final String text, @NonNull final String separator) {
+    public static String convertToTitleCaseSplitting(final @NonNull String text, final @NonNull String separator) {
         if (text.isBlank()) {
             return text;
         }
@@ -23,11 +23,11 @@ public class StringUtils {
                 .collect(Collectors.joining(" "));
     }
 
-    public static String getSuccessMessage(@NonNull final String text) {
+    public static String getSuccessMessage(final @NonNull String text) {
         return "%s%s".formatted(ChatColor.GREEN, text);
     }
 
-    public static String getFailMessage(@NonNull final String text) {
+    public static String getFailMessage(final @NonNull String text) {
         return "%s%s".formatted(ChatColor.RED, text);
     }
 }

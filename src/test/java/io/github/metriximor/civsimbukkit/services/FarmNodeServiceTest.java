@@ -388,7 +388,7 @@ class FarmNodeServiceTest extends BukkitTest {
 
     @NonNull
     private Result<ItemStack, PlaceBoundaryError> placeBound(
-            @NonNull final ItemStack previous, final double x, final double z, @NonNull final Player player) {
+            final @NonNull ItemStack previous, final double x, final double z, final @NonNull Player player) {
         return farmNodeService.placeBoundary(player, previous, new Location(getWorld(), x, 0, z));
     }
 

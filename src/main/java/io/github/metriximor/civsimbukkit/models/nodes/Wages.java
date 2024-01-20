@@ -12,7 +12,7 @@ import org.bukkit.NamespacedKey;
 public interface Wages extends Node {
     NamespacedKey WAGES_KEY = getKey(BillOfMaterialsService.SetType.WAGES.toString());
 
-    default boolean setWages(@NonNull final BillOfMaterials wageItems) {
+    default boolean setWages(final @NonNull BillOfMaterials wageItems) {
         if (isEnabled()) {
             return false;
         }

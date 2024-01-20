@@ -78,7 +78,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
 
     ParticleService getParticleService();
 
-    default Optional<ItemStack> defineBoundaries(@NonNull final Player player, @NonNull final Block nodeBlock) {
+    default Optional<ItemStack> defineBoundaries(final @NonNull Player player, final @NonNull Block nodeBlock) {
         final PolygonalArea node = getNode(nodeBlock);
         if (node == null) {
             return Optional.empty();
@@ -93,9 +93,9 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
     }
 
     default Result<ItemStack, PlaceBoundaryError> placeBoundary(
-            @NonNull final Player player,
-            @NonNull final ItemStack currentBoundaryItemStack,
-            @NonNull final Location location) {
+            final @NonNull Player player,
+            final @NonNull ItemStack currentBoundaryItemStack,
+            final @NonNull Location location) {
         final Integer index = getIndexFromItemStack(currentBoundaryItemStack).orElse(null);
         if (index == null) {
             return err(PlaceBoundaryError.NOT_A_BOUNDARY_MARKER);
@@ -154,7 +154,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         return ok(boundaryMarker.getAsArmorStand());
     }
 
-    default Result<Boolean, RegisterBoundaryError> registerBoundaries(@NonNull final Player player) {
+    default Result<Boolean, RegisterBoundaryError> registerBoundaries(final @NonNull Player player) {
         final var pair = getPolygonalAreasRepo().getById(player);
         if (pair == null) {
             return err(RegisterBoundaryError.NOT_REGISTERING_BOUNDARIES);
@@ -169,7 +169,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
             return err(RegisterBoundaryError.AREA_TOO_SMALL);
         }
         final var nodeLocation = pair.left().getLocation();
-        if (!polygon.contains(new Point(nodeLocation.getBlockX(), nodeLocation.getBlockZ()))) {
+        if (!polygon.containsInsideGrid(nodeLocation.getBlockX(), nodeLocation.getBlockZ())) {
             return err(RegisterBoundaryError.NODE_NOT_INSIDE_BOUNDARIES);
         }
         final var lastPoint = pair.right().get(pair.right().size() - 1);
@@ -190,7 +190,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         return ok(node.setArea(polygon));
     }
 
-    default boolean cancelBoundarySelection(@NonNull final Player player) {
+    default boolean cancelBoundarySelection(final @NonNull Player player) {
         final var pair = getPolygonalAreasRepo().getById(player);
         if (pair == null) {
             return false;
@@ -200,7 +200,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
     }
 
     private void handleExitingEditingMode(
-            @NonNull final Player player, @NonNull final Pair<PolygonalArea, List<PlacedBoundaryMarker>> pair) {
+            final @NonNull Player player, final @NonNull Pair<PolygonalArea, List<PlacedBoundaryMarker>> pair) {
         pair.right().stream()
                 .map(PlacedBoundaryMarker::getLocation)
                 .flatMap(location -> location.getNearbyEntitiesByType(ArmorStand.class, 1).stream())
@@ -210,7 +210,7 @@ public interface PolygonalAreaFunctionality<T extends PolygonalArea> extends Nod
         removeAllItemsThatSatisfyCondition(player, BoundaryMarker::isBoundaryMarker);
     }
 
-    private static String getParticleKey(@NonNull final Player player) {
+    private static String getParticleKey(final @NonNull Player player) {
         return "boundary_edit_%s".formatted(player.getUniqueId().toString());
     }
 }

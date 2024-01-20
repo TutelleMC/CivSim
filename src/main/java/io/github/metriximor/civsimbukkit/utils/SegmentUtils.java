@@ -25,7 +25,7 @@ public class SegmentUtils {
     }
 
     private static boolean boundaryBoxesDontBorderAtASinglePoint(
-            @NonNull final Point p1, @NonNull final Point p2, @NonNull final Point q1, @NonNull final Point q2) {
+            final @NonNull Point p1, final @NonNull Point p2, final @NonNull Point q1, final @NonNull Point q2) {
         final Point bb1TopLeft = new Point(Math.min(p1.x, p2.x), Math.max(p1.y, p2.y));
         final Point bb1BottomRight = new Point(Math.max(p1.x, p2.x), Math.min(p1.y, p2.y));
         final Point bb2TopLeft = new Point(Math.min(q1.x, q2.x), Math.max(q1.y, q2.y));
@@ -44,7 +44,7 @@ public class SegmentUtils {
 
     @Nullable
     private static Point2D.Double calculateInterceptionPoint(
-            @NonNull final Point s1, @NonNull final Point s2, @NonNull final Point d1, @NonNull final Point d2) {
+            final @NonNull Point s1, final @NonNull Point s2, final @NonNull Point d1, final @NonNull Point d2) {
         double a1 = s2.y - s1.y;
         double b1 = s1.x - s2.x;
         double c1 = a1 * s1.x + b1 * s1.y;

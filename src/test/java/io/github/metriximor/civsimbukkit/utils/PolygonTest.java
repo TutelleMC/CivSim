@@ -2,8 +2,10 @@ package io.github.metriximor.civsimbukkit.utils;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.awt.*;
+import java.awt.Point;
+import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 class PolygonTest {
@@ -46,5 +48,43 @@ class PolygonTest {
         assertEquals(1390.5, polygon.area());
         polygon.addPoint(-545, -821);
         assertEquals(537815.5, polygon.area());
+    }
+
+    @Test
+    void testGetPointsInSquareGridSimpleTriangle() {
+        var polygon = Polygon.build(THREE_POINTS);
+        assert polygon != null;
+        var result = polygon.getPointsInSquareGrid().collect(Collectors.toSet());
+        assertEquals(new HashSet<>(THREE_POINTS), result);
+    }
+
+    @Test
+    void testGetPointsInSquareGridComplexShape() {
+        var polygon = Polygon.build(List.of(
+                ZERO_ZERO,
+                new Point(10, 0),
+                new Point(10, 30),
+                new Point(0, 30),
+                new Point(0, 20),
+                new Point(5, 20),
+                new Point(5, 10),
+                new Point(0, 10)));
+        var notPresent = Polygon.build(List.of(new Point(0, 19), new Point(4, 19), new Point(4, 11), new Point(0, 11)));
+        assert notPresent != null;
+        assert polygon != null;
+        var notPresentBlocks = notPresent.getPointsInSquareGrid().collect(Collectors.toSet());
+        var result = polygon.getPointsInSquareGrid().collect(Collectors.toSet());
+        notPresentBlocks.forEach(
+                notPresentBlock -> assertFalse(result.contains(notPresentBlock), notPresentBlock.toString()));
+        assertFalse(result.contains(new Point(3, 15)));
+        assertTrue(result.contains(new Point(10, 0)));
+        assertTrue(result.contains(new Point(10, 15)));
+        assertTrue(result.contains(new Point(5, 15)));
+        assertTrue(result.contains(new Point(2, 20)));
+        assertTrue(result.contains(new Point(2, 10)));
+        assertTrue(result.contains(new Point(5, 30)));
+        assertTrue(result.contains(new Point(5, 0)));
+        assertEquals((11 * 31) - 45, result.size());
+        assertEquals((19 - 11 + 1) * (4 + 1), notPresentBlocks.size());
     }
 }

@@ -21,7 +21,7 @@ public abstract class AbstractNode implements Node {
     private final @NonNull Block block;
     private final @NonNull UUID uuid;
 
-    AbstractNode(@NonNull final Block block, @NonNull final NodeType nodeType) {
+    AbstractNode(final @NonNull Block block, final @NonNull NodeType nodeType) {
         if (!(block.getState() instanceof TileState state)) {
             throw new IllegalArgumentException();
         }
@@ -44,7 +44,7 @@ public abstract class AbstractNode implements Node {
         return pdc.has(getMarkerKey());
     }
 
-    public static boolean isTileState(@NonNull final Block block) {
+    public static boolean isTileState(final @NonNull Block block) {
         return block.getState() instanceof TileState;
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractNode implements Node {
         return state.getPersistentDataContainer().get(TYPE_KEY, DataType.asEnum(NodeType.class));
     }
 
-    public static boolean isOfType(@NonNull final Block block, @NonNull final NodeType nodeType) {
+    public static boolean isOfType(final @NonNull Block block, final @NonNull NodeType nodeType) {
         if (!isTileState(block)) {
             return false;
         }
@@ -65,26 +65,22 @@ public abstract class AbstractNode implements Node {
     }
 
     @Override
-    @NonNull
-    public UUID getNodeId() {
+    public @NonNull UUID getNodeId() {
         return uuid;
     }
 
     @Override
-    @NonNull
-    public TileState getState() {
+    public @NonNull TileState getState() {
         return (TileState) block.getState();
     }
 
     @Override
-    @NonNull
-    public Container getContainer() {
+    public @NonNull Container getContainer() {
         return (Container) block.getState();
     }
 
     @Override
-    @NonNull
-    public Location getLocation() {
+    public @NonNull Location getLocation() {
         return block.getLocation();
     }
 
@@ -102,8 +98,7 @@ public abstract class AbstractNode implements Node {
         return !toggleStatus;
     }
 
-    @NonNull
-    public abstract Transaction getTransaction();
+    public @NonNull abstract Transaction getTransaction();
 
     public boolean perform(final Integer timesPerformed) {
         var result = false;

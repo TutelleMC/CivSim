@@ -10,13 +10,13 @@ import org.bukkit.Location;
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PlacedBoundaryMarker {
-    private @NonNull final Location location;
+    private final @NonNull Location location;
 
-    public double distanceToSquared(@NonNull final Location location) {
+    public double distanceToSquared(final @NonNull Location location) {
         return this.location.distanceSquared(location);
     }
 
-    public double distanceToSquared(@NonNull final PlacedBoundaryMarker other) {
+    public double distanceToSquared(final @NonNull PlacedBoundaryMarker other) {
         return this.location.distanceSquared(other.location);
     }
 

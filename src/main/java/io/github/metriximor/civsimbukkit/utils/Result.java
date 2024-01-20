@@ -217,7 +217,7 @@ public class Result<T, E> implements Iterable<T> {
      * @param <E> Ignored.
      * @return A success result.
      */
-    public static <T, E> Result<T, E> ok(@NonNull final T ok) {
+    public static <T, E> Result<T, E> ok(final @NonNull T ok) {
         return new Result<>(ok, null);
     }
 
@@ -229,7 +229,7 @@ public class Result<T, E> implements Iterable<T> {
      * @param <E> The error type.
      * @return An error result.
      */
-    public static <T, E> Result<T, E> err(@NonNull final E err) {
+    public static <T, E> Result<T, E> err(final @NonNull E err) {
         return new Result<>(null, err);
     }
 

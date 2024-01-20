@@ -9,7 +9,7 @@ import org.bukkit.plugin.Plugin;
 public class CommandsService {
     private final PaperCommandManager paperCommandManager;
 
-    public CommandsService(@NonNull final Plugin plugin, @NonNull final List<BaseCommand> commands) {
+    public CommandsService(final @NonNull Plugin plugin, final @NonNull List<BaseCommand> commands) {
         this.paperCommandManager = new PaperCommandManager(plugin);
 
         paperCommandManager.enableUnstableAPI("help");

@@ -34,10 +34,10 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         return !isNode(block);
     }
 
-    public abstract T build(@NonNull final Block block);
+    public abstract T build(final @NonNull Block block);
 
     @Nullable
-    public T getNode(@NonNull final Block block) {
+    public T getNode(final @NonNull Block block) {
         final T result = nodeRepository.getById(block);
         if (result != null) {
             return result;
@@ -53,7 +53,7 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         return node;
     }
 
-    public Optional<T> registerNode(@NonNull final Block block) {
+    public Optional<T> registerNode(final @NonNull Block block) {
         final T result = build(block);
         if (result == null) {
             return Optional.empty();
@@ -63,13 +63,13 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         return Optional.of(result);
     }
 
-    public void unregisterNode(@NonNull final Block block) {
+    public void unregisterNode(final @NonNull Block block) {
         if (!nodeRepository.remove(block)) {
             logger.severe("Failed to remove node from registered nodes: %s".formatted(block));
         }
     }
 
-    public boolean isEnabled(@NonNull final Block block) {
+    public boolean isEnabled(final @NonNull Block block) {
         if (blockIsNotNode(block)) {
             return false;
         }
@@ -80,7 +80,7 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
         return node.isEnabled();
     }
 
-    public void toggleNode(@NonNull final Block block) {
+    public void toggleNode(final @NonNull Block block) {
         if (blockIsNotNode(block)) {
             return;
         }
@@ -99,11 +99,11 @@ abstract class AbstractNodeService<T extends Node> implements NodeService<T> {
     }
 
     // TODO move this to ItemSetService and ItemSet object
-    public void addMarker(@NonNull final ItemStack itemStack) {
+    public void addMarker(final @NonNull ItemStack itemStack) {
         itemStack.editMeta(meta -> setNodeMarker(meta.getPersistentDataContainer()));
     }
 
-    public boolean hasMarker(@NonNull final ItemStack itemStack) {
+    public boolean hasMarker(final @NonNull ItemStack itemStack) {
         return itemStack.getItemMeta().getPersistentDataContainer().has(NamespacedKeyUtils.getMarkerKey());
     }
 

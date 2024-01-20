@@ -24,7 +24,7 @@ public class BoundaryMarker {
         this.index = index;
     }
 
-    public static boolean isBoundaryMarker(@NonNull final ItemStack boundaryMarker) {
+    public static boolean isBoundaryMarker(final @NonNull ItemStack boundaryMarker) {
         if (boundaryMarker.getType() != Material.ARMOR_STAND) {
             return false;
         }
@@ -37,7 +37,7 @@ public class BoundaryMarker {
     }
 
     @NonNull
-    public static Optional<Integer> getIndexFromItemStack(@NonNull final ItemStack boundaryMarker) {
+    public static Optional<Integer> getIndexFromItemStack(final @NonNull ItemStack boundaryMarker) {
         if (!isBoundaryMarker(boundaryMarker)) {
             return Optional.empty();
         }
@@ -46,7 +46,7 @@ public class BoundaryMarker {
     }
 
     @NonNull
-    public PlacedBoundaryMarker placeAt(@NonNull final Location location) {
+    public PlacedBoundaryMarker placeAt(final @NonNull Location location) {
         return new PlacedBoundaryMarker(location);
     }
 

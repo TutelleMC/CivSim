@@ -8,7 +8,7 @@ import org.bukkit.block.Block;
 public interface NodeService<T extends Node> {
     boolean blockIsNotNode(final Block block);
 
-    T getNode(@NonNull final Block block);
+    T getNode(final @NonNull Block block);
 
     Logger getLogger();
 }

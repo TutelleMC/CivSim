@@ -37,13 +37,13 @@ public class CivSimCommand extends BaseCommand {
 
     @Subcommand("version")
     @Description("The version command displays the currently installed version of CivSim")
-    public void onInfo(@NonNull final CommandSender sender) {
+    public void onInfo(final @NonNull CommandSender sender) {
         sender.sendMessage("Version: %s, Author: Metriximor".formatted(CivSimBukkitPlugin.getVersion()));
     }
 
     @Subcommand("buy")
     @Description("TODO") // TODO finish this
-    public void onBuy(@NonNull final Player player, @NonNull final NodeType node) {
+    public void onBuy(final @NonNull Player player, final @NonNull NodeType node) {
         final var farmItem = new ItemStack(Material.BARREL, 1);
 
         farmNodeService.addMarker(farmItem);
@@ -62,7 +62,7 @@ public class CivSimCommand extends BaseCommand {
     public class BoundariesClass extends BaseCommand {
         @Subcommand("done")
         @Description("Confirm your boundary selection")
-        public void onDone(@NonNull final Player player) {
+        public void onDone(final @NonNull Player player) {
             final var result = farmNodeService.registerBoundaries(player);
             if (result.isOk()) {
                 player.sendMessage(getSuccessMessage("Boundaries registered successfully"));
@@ -83,7 +83,7 @@ public class CivSimCommand extends BaseCommand {
 
         @Subcommand("cancel")
         @Description("Cancel your boundary selection")
-        public void onCancel(@NonNull final Player player) {
+        public void onCancel(final @NonNull Player player) {
             if (farmNodeService.cancelBoundarySelection(player)) {
                 player.sendMessage(getSuccessMessage("Canceled Boundary selection"));
                 return;
@@ -98,7 +98,7 @@ public class CivSimCommand extends BaseCommand {
     public class WagesClass extends BaseCommand {
         @Subcommand("new")
         @Description("Configure wages to be paid on a workable block")
-        public void onCreate(@NonNull final Player player, @NonNull Material material, int quantity) {
+        public void onCreate(final @NonNull Player player, @NonNull Material material, int quantity) {
             final var requiredItem = List.of(new ItemStack(material, quantity));
             final var wagesItem = billOfMaterialsService.createItemSetItemStack(WAGES, requiredItem);
             if (wagesItem == null) {
@@ -111,13 +111,13 @@ public class CivSimCommand extends BaseCommand {
 
         @Subcommand("remove")
         @Description("Removes the wages from the block that is being looked at")
-        public void onGet(@NonNull final Player player) {
+        public void onGet(final @NonNull Player player) {
             getWagesFromNode(player, farmNodeService::takeWages);
         }
 
         @Subcommand("copy")
         @Description("Copies the wages from the block that is being looked at without erasing the block's wages")
-        public void onCopy(@NonNull final Player player) {
+        public void onCopy(final @NonNull Player player) {
             getWagesFromNode(player, farmNodeService::copyWages);
         }
 
