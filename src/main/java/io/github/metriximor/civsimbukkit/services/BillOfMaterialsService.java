@@ -15,7 +15,7 @@ public class BillOfMaterialsService {
         WAGES
     }
 
-    public ItemStack createItemSetItemStack(@NonNull final SetType type, @NonNull final List<ItemStack> items) {
+    public ItemStack createItemSetItemStack(final @NonNull SetType type, final @NonNull List<ItemStack> items) {
         final var bill = new BillOfMaterials(type);
         final var valid = bill.addAll(items);
         if (!valid) {
@@ -25,7 +25,7 @@ public class BillOfMaterialsService {
         return bill.getAsItem();
     }
 
-    public boolean isItemSetItemStack(@NonNull final SetType type, @NonNull final ItemStack itemStack) {
+    public boolean isItemSetItemStack(final @NonNull SetType type, final @NonNull ItemStack itemStack) {
         return itemStack.getItemMeta().getPersistentDataContainer().has(NamespacedKeyUtils.getKey(type.toString()));
     }
 }

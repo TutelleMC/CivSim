@@ -37,7 +37,7 @@ public class BoundaryListener implements Listener {
     private final FarmNodeService farmNodeService;
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerPlaceBoundaryMarker(@NonNull final EntityPlaceEvent event) {
+    public void onPlayerPlaceBoundaryMarker(final @NonNull EntityPlaceEvent event) {
         final var player = event.getPlayer();
         if (!EntityType.ARMOR_STAND.equals(event.getEntityType()) || player == null) {
             return;
@@ -86,17 +86,17 @@ public class BoundaryListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerLogout(@NonNull final PlayerQuitEvent event) {
+    public void onPlayerLogout(final @NonNull PlayerQuitEvent event) {
         farmNodeService.cancelBoundarySelection(event.getPlayer());
     }
 
     @EventHandler
-    public void onPlayerDeath(@NonNull final PlayerDeathEvent event) {
+    public void onPlayerDeath(final @NonNull PlayerDeathEvent event) {
         farmNodeService.cancelBoundarySelection(event.getPlayer());
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerThrowBoundaryMarkerAway(@NonNull final PlayerDropItemEvent event) {
+    public void onPlayerThrowBoundaryMarkerAway(final @NonNull PlayerDropItemEvent event) {
         final var droppedItem = event.getItemDrop().getItemStack();
         if (!BoundaryMarker.isBoundaryMarker(droppedItem)) {
             return;
@@ -106,7 +106,7 @@ public class BoundaryListener implements Listener {
     }
 
     @EventHandler(ignoreCancelled = true)
-    public void onPlayerAttackBoundaryMarker(@NonNull final EntityDamageEvent event) {
+    public void onPlayerAttackBoundaryMarker(final @NonNull EntityDamageEvent event) {
         if (!event.getEntityType().equals(EntityType.ARMOR_STAND)) {
             return;
         }
@@ -123,7 +123,7 @@ public class BoundaryListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerJoinEvent(@NonNull final PlayerJoinEvent event) {
+    public void onPlayerJoinEvent(final @NonNull PlayerJoinEvent event) {
         removeAllItemsThatSatisfyCondition(event.getPlayer(), BoundaryMarker::isBoundaryMarker);
     }
 }

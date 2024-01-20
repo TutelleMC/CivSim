@@ -21,7 +21,7 @@ public class ShopNode extends AbstractNode {
         throw new UnsupportedOperationException("TODO");
     }
 
-    public static ShopNode build(@NonNull final Block block) {
+    public static ShopNode build(final @NonNull Block block) {
         if (!isOfType(block, TYPE)) {
             return null;
         }

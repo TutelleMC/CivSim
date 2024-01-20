@@ -62,7 +62,7 @@ public class SimulationService {
         }
     }
 
-    public boolean registerTransaction(@NonNull final Node node) {
+    public boolean registerTransaction(final @NonNull Node node) {
         if (registeredTransactions.containsKey(node.getNodeId())) {
             logger.severe(
                     "Attempted to register transaction of node %s that has registered transactions".formatted(node));
@@ -74,7 +74,7 @@ public class SimulationService {
         return queueToAdd.containsKey(node.getNodeId());
     }
 
-    public boolean unregisterTransaction(@NonNull final Node node) {
+    public boolean unregisterTransaction(final @NonNull Node node) {
         if (queueToAdd.containsKey(node.getNodeId())) {
             queueToAdd.remove(node.getNodeId());
             return true;
@@ -89,7 +89,7 @@ public class SimulationService {
         return queueToRemove.add(node.getNodeId());
     }
 
-    // public boolean updateTransactionStock(@NonNull final TransactionUpdate
+    // public boolean updateTransactionStock(final @NonNull TransactionUpdate
     // transactionUpdate) {
     // throw new UnsupportedOperationException();
     // }

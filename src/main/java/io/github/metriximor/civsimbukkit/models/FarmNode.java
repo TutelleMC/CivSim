@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public class FarmNode extends AbstractNode implements Wages, PolygonalArea {
     private static final NodeType TYPE = NodeType.FARM;
 
-    FarmNode(@NonNull final Block block) {
+    FarmNode(final @NonNull Block block) {
         super(block, TYPE);
     }
 
@@ -27,7 +27,7 @@ public class FarmNode extends AbstractNode implements Wages, PolygonalArea {
         return container.getInventory().addItem(new ItemStack(Material.WHEAT)).isEmpty();
     }
 
-    public static FarmNode build(@NonNull final Block block) {
+    public static FarmNode build(final @NonNull Block block) {
         if (!isOfType(block, TYPE)) {
             return null;
         }

@@ -20,16 +20,16 @@ public class ParticleService {
     @NonNull
     private final Map<String, List<ParticleBuilder>> registeredParticles = new ConcurrentHashMap<>();
 
-    public ParticleService(@NonNull final Plugin plugin) {
+    public ParticleService(final @NonNull Plugin plugin) {
         new ParticleSpawner().runTaskTimerAsynchronously(plugin, 0, TICKS_INTERVAL);
     }
 
     public boolean drawLine(
-            @NonNull final String key,
-            @NonNull final Location start,
-            @NonNull final Location end,
-            @NonNull final Color color,
-            @NonNull final Player... receivers) {
+            final @NonNull String key,
+            final @NonNull Location start,
+            final @NonNull Location end,
+            final @NonNull Color color,
+            final @NonNull Player... receivers) {
         if (!start.getWorld().equals(end.getWorld())) {
             return false;
         }
@@ -57,7 +57,7 @@ public class ParticleService {
         return registeredParticles.containsKey(key);
     }
 
-    public boolean removeAll(@NonNull final String key) {
+    public boolean removeAll(final @NonNull String key) {
         return registeredParticles.remove(key) != null;
     }
 

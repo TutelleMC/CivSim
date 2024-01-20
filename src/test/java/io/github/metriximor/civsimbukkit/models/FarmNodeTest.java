@@ -85,7 +85,7 @@ class FarmNodeTest extends BukkitTest {
         assertFalse(node.getContainer().getInventory().isEmpty());
     }
 
-    private FarmNode setupFarmNode(@NonNull final Block block) {
+    private FarmNode setupFarmNode(final @NonNull Block block) {
         return FarmNode.build(block);
     }
 }

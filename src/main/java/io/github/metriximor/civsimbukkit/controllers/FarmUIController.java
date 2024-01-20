@@ -20,7 +20,7 @@ import xyz.xenondevs.invui.window.Window;
 public class FarmUIController {
     private final FarmNodeService farmNodeService;
 
-    public void openNodeUI(@NonNull final Player player, @NonNull final Block block) {
+    public void openNodeUI(final @NonNull Player player, final @NonNull Block block) {
         if (farmNodeService.blockIsNotNode(block)) {
             player.sendMessage("%sToggling non toggleable block. Please contact an admin!".formatted(ChatColor.RED));
             return;

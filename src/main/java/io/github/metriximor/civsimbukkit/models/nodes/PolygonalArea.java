@@ -19,7 +19,7 @@ public interface PolygonalArea extends Node {
         return pdc.has(AREA_MARKER);
     }
 
-    default boolean setArea(@NonNull final Polygon polygon) {
+    default boolean setArea(final @NonNull Polygon polygon) {
         var state = getState();
         var pdc = state.getPersistentDataContainer();
         pdc.set(AREA_MARKER, DataType.BOOLEAN, true);

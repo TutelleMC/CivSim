@@ -43,14 +43,14 @@ public class BillOfMaterials {
         return Optional.of(bill);
     }
 
-    public boolean addAll(@NonNull final List<ItemStack> list) {
+    public boolean addAll(final @NonNull List<ItemStack> list) {
         if (list.stream().anyMatch(Objects::isNull)) {
             return false;
         }
         return list.stream().allMatch(this::add);
     }
 
-    public boolean add(@NonNull final ItemStack item) {
+    public boolean add(final @NonNull ItemStack item) {
         return bill.addItem(item).isEmpty();
     }
 

@@ -26,11 +26,11 @@ public class FarmNodeService extends AbstractNodeService<FarmNode>
     private final ParticleService particleService;
 
     public FarmNodeService(
-            @NonNull final Logger logger,
-            @NonNull final BillOfMaterialsService billOfMaterialsService,
-            @NonNull final Repository<Block, FarmNode> nodeRepository,
-            @NonNull final SimulationService simulationService,
-            @NonNull final ParticleService particleService) {
+            final @NonNull Logger logger,
+            final @NonNull BillOfMaterialsService billOfMaterialsService,
+            final @NonNull Repository<Block, FarmNode> nodeRepository,
+            final @NonNull SimulationService simulationService,
+            final @NonNull ParticleService particleService) {
         super(logger, billOfMaterialsService, nodeRepository, simulationService);
         this.boundariesRepo = new InMemoryRepository<>();
         this.particleService = particleService;

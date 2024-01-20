@@ -5,9 +5,9 @@ import org.jetbrains.annotations.Nullable;
 
 public interface Repository<K, V> {
     @Nullable
-    V getById(@NonNull final K key);
+    V getById(final @NonNull K key);
 
-    void add(@NonNull final K key, @NonNull final V value);
+    void add(final @NonNull K key, final @NonNull V value);
 
-    boolean remove(@NonNull final K key);
+    boolean remove(final @NonNull K key);
 }

@@ -7,7 +7,7 @@ import lombok.NonNull;
 import org.bukkit.block.Block;
 
 public interface WagesFunctionality<T extends Wages> extends NodeService<T> {
-    default boolean addWages(@NonNull final Block block, @NonNull final BillOfMaterials bill) {
+    default boolean addWages(final @NonNull Block block, final @NonNull BillOfMaterials bill) {
         final var node = getNode(block);
         if (node == null || node.isEnabled()) {
             return false;
@@ -24,7 +24,7 @@ public interface WagesFunctionality<T extends Wages> extends NodeService<T> {
     }
 
     @NonNull
-    default Optional<BillOfMaterials> takeWages(@NonNull final Block block) {
+    default Optional<BillOfMaterials> takeWages(final @NonNull Block block) {
         if (blockIsNotNode(block)) {
             return Optional.empty();
         }
@@ -42,7 +42,7 @@ public interface WagesFunctionality<T extends Wages> extends NodeService<T> {
     }
 
     @NonNull
-    default Optional<BillOfMaterials> copyWages(@NonNull final Block block) {
+    default Optional<BillOfMaterials> copyWages(final @NonNull Block block) {
         if (blockIsNotNode(block)) {
             return Optional.empty();
         }
